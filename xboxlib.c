@@ -502,9 +502,11 @@ int load_xbefile(unsigned int &xbe,unsigned int &filesize,char *filename) {
    f = fopen(filename, "r");
    if (f!=NULL) 
     {
+         fseek(f, 0, SEEK_END); 
+         filesize = ftell(f); 
+         fseek(f, 0, SEEK_SET);
          printf("Loading file %s (%i bytes)\n", filename, filesize);
          
-         fseek(f, 0, SEEK_END); filesize = ftell(f); fseek(f, 0, SEEK_SET);
          file = malloc(filesize);
          xbe=(unsigned int)file;
          fread(file, 1, filesize, f);
