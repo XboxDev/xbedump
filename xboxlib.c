@@ -163,7 +163,7 @@ int read_rsafrombin_asterix()
 	printf("Using Linux Test Keys from linuxkey.bin\n");
 	//memcpy(&xePublicKeyData,&Testkey[0],20+256+256);
 
-	f = fopen("linuxkey.bin", "r");
+	f = fopen("linuxkey.bin", "rb");
     	if (f!=NULL) 
     	{    
         	fseek(f, 0, SEEK_END); 
@@ -581,7 +581,7 @@ int read_rsafromflash(char *filename,unsigned int dumpflag)
 	
 		
 	// Load the "real Key from flash.bin"
-	f = fopen(filename, "r");
+	f = fopen(filename, "rb");
     	if (f!=NULL) 
     	{    
         	fseek(f, 0, SEEK_END); filesize = ftell(f); fseek(f, 0, SEEK_SET);
@@ -627,7 +627,7 @@ int load_xbefile(unsigned int &xbe,unsigned int &filesize,char *filename) {
    FILE *f;
    void *file;
    
-   f = fopen(filename, "r");
+   f = fopen(filename, "rb");
    if (f!=NULL) 
     {
          fseek(f, 0, SEEK_END); 

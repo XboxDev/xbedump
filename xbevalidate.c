@@ -168,7 +168,7 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 	if (fail==0) printf("\nXBE file integrity:    OK\n"); else  printf("\nXBE file integrity:    FALSE !!!!!!! FALSE !!!!!\n");
 	
 	if (option_flag & 0x00020000){
-	 f = fopen("out.xbe", "w");
+	 f = fopen("out.xbe", "wb");
 	 fwrite(xbe, 1, filesize, f);
          
          fclose(f);	
