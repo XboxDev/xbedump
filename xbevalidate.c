@@ -76,7 +76,15 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 	printf("Certificate Size  :    ");
 	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
 	if (cert->Size>=0x1d0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-		
+	
+	// Correct it, if Correct Bit Set
+	if (option_flag & 0x00020000) {
+		if (option_flag & 0x20000000) { // Habibi Option 
+			printf("Correcting Mediatypes and Regions  \n");
+			cert->MediaTypes = 0x800000FF;
+			cert->GameRegion = 0x80000007;
+		}
+	}
 	// Validates the Section Header Address 
 	printf("Section Address:       ");
 	//eax +=0x1D0;
@@ -141,6 +149,11 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 	
 		printf("\n"); 
 	 }	
+
+	if (option_flag & 0x00080000) {
+		printf("Correcting Signature:\n"); 
+		GenarateSignaturex(xbe);
+	}
 	
 	printf("2048 RSA Signature:    ");
 	if (VerifySignaturex(xbe,0)== 1) { 
@@ -154,11 +167,6 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 		printf("fail"); 
 	  	if (option_flag & 0x01000000) {
 			VerifySignaturex(xbe,1);
-		}
-		if (option_flag & 0x00080000) {
-			printf("Correcting Signature:\n"); 
-			GenarateSignaturex(xbe);
-			
 		}
 	}                   
 	

@@ -121,43 +121,135 @@ void printw(char *s) {
 }
 
 void printInitFlags(int f) {
-    if (!f) printf("none");
-    if (f & XBE_INIT_MOUNT_UTILITY) printf("XBE_INIT_MOUNT_UTILITY ");
-    if (f & XBE_INIT_FORMAT_UTILITY) printf("XBE_INIT_FORMAT_UTILITY ");
-    if (f & XBE_INIT_64M_RAM_ONLY) printf("XBE_INIT_64M_RAM_ONLY ");
-    if (f & XBE_INIT_DONT_SETUP_HDD) printf("XBE_INIT_DONT_SETUP_HDD ");
+    if (!f) {
+  		printf("\n                                    : ");
+	    	printf("none");
+    } else {
+	printf("0x%08X",f);
+    	if (f & XBE_INIT_MOUNT_UTILITY) {
+      		printf("\n                                    : ");
+		printf("XBE_INIT_MOUNT_UTILITY ");
+		}
+    	if (f & XBE_INIT_FORMAT_UTILITY) {
+   		printf("\n                                    : ");
+		printf("XBE_INIT_FORMAT_UTILITY ");
+		}
+    	if (f & XBE_INIT_64M_RAM_ONLY) {
+    		printf("\n                                    : ");
+		printf("XBE_INIT_64M_RAM_ONLY ");
+		}
+    	if (f & XBE_INIT_DONT_SETUP_HDD) {
+    		printf("\n                                    : ");
+		printf("XBE_INIT_DONT_SETUP_HDD ");
+		}	
+	}
 }
 
 void printMediaTypes(int f) {
-    if (!f) printf("none");
-    if (f & XBE_MEDIA_HDD) printf("XBE_MEDIA_HDD ");
-    if (f & XBE_MEDIA_XBOX_DVD) printf("XBE_MEDIA_XBOX_DVD ");
-    if (f & XBE_MEDIA_ANY_CD_OR_DVD) printf("XBE_MEDIA_ANY_CD_OR_DVD ");
-    if (f & XBE_MEDIA_CD) printf("XBE_MEDIA_CD ");
-    if (f & XBE_MEDIA_1LAYER_DVDROM) printf("XBE_MEDIA_1LAYER_DVDROM ");
-    if (f & XBE_MEDIA_2LAYER_DVDROM) printf("XBE_MEDIA_2LAYER_DVDROM ");
-    if (f & XBE_MEDIA_1LAYER_DVDR) printf("XBE_MEDIA_1LAYER_DVDR ");
-    if (f & XBE_MEDIA_2LAYER_DVDR) printf("XBE_MEDIA_2LAYER_DVDR ");
-    if (f & XBE_MEDIA_USB) printf("XBE_MEDIA_USB ");
-    if (f & XBE_MEDIA_ALLOW_UNLOCKED_HDD) printf("XBE_MEDIA_ALLOW_UNLOCKED_HDD ");
+    if (!f) {
+	printf("\n                                    : ");
+    	printf("none"); 
+    } else {
+	printf("0x%08X",f);
+    	if (f & XBE_MEDIA_HDD) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_HDD ");                  
+    		}
+    	if (f & XBE_MEDIA_XBOX_DVD) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_XBOX_DVD ");
+    		}
+    	if (f & XBE_MEDIA_ANY_CD_OR_DVD) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_ANY_CD_OR_DVD ");
+    		}
+    	if (f & XBE_MEDIA_CD) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_CD ");
+    		}
+    	if (f & XBE_MEDIA_1LAYER_DVDROM) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_1LAYER_DVDROM ");
+    		}
+    	if (f & XBE_MEDIA_2LAYER_DVDROM) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_2LAYER_DVDROM ");
+    		}
+    	if (f & XBE_MEDIA_1LAYER_DVDR) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_1LAYER_DVDR ");
+    		}
+    	if (f & XBE_MEDIA_2LAYER_DVDR) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_2LAYER_DVDR ");
+    		}
+    	if (f & XBE_MEDIA_USB) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_USB ");
+    		}
+    	if (f & XBE_MEDIA_ALLOW_UNLOCKED_HDD) {
+    		printf("\n                                    : ");
+    		printf("XBE_MEDIA_ALLOW_UNLOCKED_HDD ");
+    		}
+    }
 }
 
 void printGameRegion(int f) {
-    if (!f) printf("none");
-    if (f & XBE_REGION_US_CANADA) printf("XBE_REGION_US_CANADA ");
-    if (f & XBE_REGION_JAPAN) printf("XBE_REGION_JAPAN ");
-    if (f & XBE_REGION_ELSEWHERE) printf("XBE_REGION_ELSEWHERE ");
-    if (f & XBE_REGION_DEBUG) printf("XBE_REGION_DEBUG ");
+    if (!f) {
+    	printf("\n                                    : ");
+	printf("none");
+    } else {
+	printf("0x%08X",f);
+    	if (f & XBE_REGION_US_CANADA) {
+    		printf("\n                                    : ");
+    		printf("XBE_REGION_US_CANADA ");
+    		}
+    	if (f & XBE_REGION_JAPAN) {
+    		printf("\n                                    : ");
+    		printf("XBE_REGION_JAPAN ");
+    		}    	
+    	if (f & XBE_REGION_ELSEWHERE) {
+    		printf("\n                                    : ");
+    		printf("XBE_REGION_ELSEWHERE ");
+    		}
+    	if (f & XBE_REGION_DEBUG) {
+    		printf("\n                                    : ");
+    		printf("XBE_REGION_DEBUG ");
+    		}    	
+    }
 }
 
 void printFlags(int f) {
-    if (!f) printf("none");
-    if (f & XBE_SEC_WRITABLE) printf("XBE_SEC_WRITABLE ");
-    if (f & XBE_SEC_PRELOAD) printf("XBE_SEC_PRELOAD ");
-    if (f & XBE_SEC_EXECUTABLE) printf("XBE_SEC_EXECUTABLE ");
-    if (f & XBE_SEC_INSERTED_FILE) printf("XBE_SEC_INSERTED_FILE ");
-    if (f & XBE_SEC_RO_HEAD_PAGE) printf("XBE_SEC_RO_HEAD_PAGE ");
-    if (f & XBE_SEC_RO_TAIL_PAGE) printf("XBE_SEC_RO_TAIL_PAGE ");
+    if (!f) {
+    		printf("\n                                    : ");
+	   	printf("none"); 
+    } else {
+	printf("0x%08X",f);
+    	if (f & XBE_SEC_WRITABLE) {
+    		printf("\n                                    : ");
+    		printf("XBE_SEC_WRITABLE ");
+    		}
+    	if (f & XBE_SEC_PRELOAD) {
+    		printf("\n                                    : ");
+    		printf("XBE_SEC_PRELOAD ");
+    		}
+    	if (f & XBE_SEC_EXECUTABLE) {
+    		printf("\n                                    : ");
+		printf("XBE_SEC_EXECUTABLE ");
+		}
+    	if (f & XBE_SEC_INSERTED_FILE) {
+    		printf("\n                                    : ");
+    		printf("XBE_SEC_INSERTED_FILE ");
+    		}
+    	if (f & XBE_SEC_RO_HEAD_PAGE) {
+    		printf("\n                                    : ");
+    		printf("XBE_SEC_RO_HEAD_PAGE ");
+    		}
+    	if (f & XBE_SEC_RO_TAIL_PAGE) {
+    		printf("\n                                    : ");
+    		printf("XBE_SEC_RO_TAIL_PAGE ");
+    		}
+    }
 }
 
 
@@ -222,14 +314,18 @@ if (option_flag & 0x00000001) {
          printf("Pointer to certificate data         : 0x%08X\n", (unsigned int)header->Certificate);
          printf("Number of sections                  : 0x%08X\n", (unsigned int)header->NumSections);
          printf("Pointer to section headers          : 0x%08X\n", (unsigned int)header->Sections);
-         printf("Initialization flags                : 0x%08X", (unsigned int) header->InitFlags); 
+         printf("Initialization flags                : ");
+
          printInitFlags(header->InitFlags); printf("\n");
 
 }
    //      EntryPoint = (unsigned int)header->EntryPoint ^ 0xa8fc57ab; /* debug: 0x0x94859d4b */
 if (option_flag & 0x00000001) {                      
 	 xorkey=xorentry(0);
-         printf("Entry Point                         : 0x%08X (Actual: 0x%08X  Retail: 0x%08X Debug: 0x%08X)\n", 
+         printf("Pointer to kernel thunk table       : 0x%08X \n"
+         	"                                    : 0x%08X  (Actual)\n"
+         	"                                    : 0x%08X  (Retail)\n"
+         	"                                    : 0x%08X  (Debug)\n", 
          (unsigned int)header->EntryPoint,
          (unsigned int)header->EntryPoint^xorkey,
          (unsigned int)header->EntryPoint^0xa8fc57ab,
@@ -257,7 +353,10 @@ if (option_flag & 0x00000001) {
 
 if (option_flag & 0x00000001) {
 
-         printf("Pointer to kernel thunk table       : 0x%08X (Actual: 0x%08X  Retail: 0x%08X Debug: 0x%08X)\n", 
+         printf("Pointer to kernel thunk table       : 0x%08X \n"
+         	"                                    : 0x%08X  (Actual)\n"
+         	"                                    : 0x%08X  (Retail)\n"
+         	"                                    : 0x%08X  (Debug)\n", 
          (unsigned int)header->KernelThunkTable,
          (unsigned int)header->KernelThunkTable^xorkey,
          (unsigned int)header->KernelThunkTable^0x5b6d40b6,
@@ -289,10 +388,12 @@ if (option_flag & 0x00000002) {
          printf("Disk number                         : 0x%08X\n", cert->DiskNumber);
          printf("Version                             : 0x%08X\n", cert->Version);
          printf("LAN key                             : "); 
-         printhexm(cert->LanKey, sizeof(cert->LanKey));
+         for (i = 0; i< sizeof(cert->LanKey);i++) printf("%02X ",cert->LanKey[i]);
+         printf("\n");
          printf("Signature key                       : "); 
-         printhexm(cert->SignatureKey, sizeof(cert->SignatureKey));
-         printf("Alternate signature keys            : "); 
+         for (i = 0; i< sizeof(cert->SignatureKey);i++) printf("%02X ",cert->SignatureKey[i]);
+         printf("\n");
+	 printf("Alternate signature keys            : "); 
          printhexm((unsigned char*)cert->AlternateSignatureKeys, sizeof(cert->AlternateSignatureKeys));
 
 }	

@@ -212,7 +212,7 @@ void 		addg(giant a, giant b);
 void 		subg(giant a, giant b);
 
 /* Returns the number of trailing zero bits in g. */
-int			numtrailzeros(giant g);
+int		numtrailzeros(giant g);
 
 /* u becomes greatest power of two not exceeding u/v. */
 void		bdivg(giant v, giant u);
@@ -224,7 +224,7 @@ int 		binvg(giant n, giant x);
  * inverse does not exist, 0 is returned and x := GCD(n, x). */
 int 		invg(giant n, giant x);
 
-int			mersenneinvg(int q, giant x);
+int		mersenneinvg(int q, giant x);
 
 /* Classical GCD, x:= GCD(n, x). */
 void 		cgcdg(giant n, giant x);

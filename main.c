@@ -41,13 +41,16 @@ void usage(){
 	
 	"   -sm          Uses Microsoft Signature (default mode)\n"
 	"                (Note: Signing not possible, as we do not have the private key)\n"
+	"   -shabibi     Uses the Habibi Signature Keys\n\n"
 	"   -st          Uses the Test Keys i have created .. leaves the XOR unchanged\n\n"
-	
+		
 	"   -d1          Debugoutput for option -vh\n\n"
 	
 	"  ---- Special Options -----\n\n"
+	"   -habibi      Special Option, Signes the xbe with Habibi Key and Sets all media flags\n\n"
 	"   -sign        Special Option, Signes the xbe with the key who is stored in the xboxlib.c\n"
 	"                patches the XOR Keys\n"
+	
 	"   -xbgs        Dumps xbgs output\n"
 	"   ?            Display Help\n\n"
 	
@@ -71,8 +74,6 @@ int main (int argc, const char * argv[])
       //validatexbe("secret/xboxdash.xbe");
 	if (argc == 2) {
 		if (strcmp(argv[1],"--test")==0) { 
-		//int gen_linux_rsadata();
-		//gen_linux_rsadata();
 			return 0; 
 		}
 	}
@@ -91,7 +92,8 @@ int main (int argc, const char * argv[])
 		
 		if (strcmp(argv[counter],"-sm")==0)  dumpflag |= 0x00000000;
 		if (strcmp(argv[counter],"-st")==0)  dumpflag |= 0x10000000;
-				
+		if (strcmp(argv[counter],"-shabibi")==0)  dumpflag |= 0x20000000;
+						
 		if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
  		if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
  	  	if (strcmp(argv[counter],"-xbgs")==0) dumpflag |= 0x0000000A;
@@ -114,25 +116,39 @@ int main (int argc, const char * argv[])
 				dumpflag |= 0x10000000;  // Use Linux Test Keys
 				verifyagain=1;
 			}
-			
-		}
 
+		if (strcmp(argv[counter],"-habibi")==0) { 
+				dumpflag=0;
+				dumpflag |= 0x00010000;  // Verify Header
+				dumpflag |= 0x00020000;  // Write Back
+				dumpflag |= 0x00040000;  // Generate Certificate
+				dumpflag |= 0x00080000;  // Generate Signature
+				dumpflag |= 0x00100000;  // Patch the XOR Keys
+				dumpflag |= 0x20000000;  // Gernerate Habibi Keys
+				verifyagain=1;
+			}
+
+			
+		}      // End For Loop
+
+	
+	
+	
 		if(dumpflag != 0x0000000A) {
-			printf("XBE Dumper 0.4-BETA Developer Release\n");
+				printf("XBE Dumper 0.5-BETA Release\n");
 		}
 
 		//read_rsafromflash("flash.bin",dumpflag);
 		load_rsa(dumpflag);
 		
 		if (dumpflag & 0x00000FFF) {
-						load_xbefile(xbefile,filesize,&filename[0]);
-						dumpxbe((void *)xbefile,dumpflag);
-					}
+				load_xbefile(xbefile,filesize,&filename[0]);
+				dumpxbe((void *)xbefile,dumpflag);
+				}
 		if (dumpflag & 0x0fff0000) {
-						load_xbefile(xbefile,filesize,&filename[0]);						
-						validatexbe((void *)xbefile,filesize,dumpflag);
-						
-					}
+				load_xbefile(xbefile,filesize,&filename[0]);						
+				validatexbe((void *)xbefile,filesize,dumpflag);
+				}
 						
 		// Verify the signed file
 		
