@@ -69,7 +69,7 @@ int main (int argc, const char * argv[])
 	unsigned int dumpflag=0;
 	char filename[512];
 	int verifyagain=0;
-	printf("XBE Dumper 0.3b\n");
+	printf("XBE Dumper 0.3c\n");
 
 //      dumpxbe("secret/xboxdash.xbe");
       //validatexbe("secret/xboxdash.xbe");
