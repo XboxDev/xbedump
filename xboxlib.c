@@ -104,7 +104,7 @@ typedef struct RSA_PUBLIC_KEY
 	char Magic[4];  		// "RSA1"
 	unsigned int Bloblen; 		// 264 (Modulus + Exponent + Modulussize)
 	unsigned char Bitlen[4];  	// 2048
-	unsigned char ModulusSize[4];  	// 255 (bytes in the Modulus)
+	unsigned int ModulusSize;	// 255 (bytes in the Modulus)
 	unsigned char Exponent[4];
 	unsigned char Modulus[256];     // Bit endian style
 	unsigned char Privatekey[256];  // Private Key .. we do not have it -- Big endian style
@@ -168,40 +168,100 @@ int decrypt_signature(unsigned char *c_number,unsigned char *cryptbuffer){
 
     for (count=0;count<256;count++) cryptbuffer[count]=0x00;
     int len=BN_bn2bin(rsa_out, d_number);
-    for (count=0;count<len;count++) cryptbuffer[256-len+count]=d_number[count]; 
-     
+    //for (count=0;count<len;count++) cryptbuffer[256-len+count]=d_number[count]; 
+    
+    // Reverse it to "pseudo Big-Endian" Format
+    for (count=0;count<len;count++) cryptbuffer[255+(len-256)-count]=d_number[count]; 
+ /*
+    printf("\ntest\n");
+    for (count=0;count<256;count++) printf("%02X",  cryptbuffer[count]);
+    printf("\ntest-end\n");
+ */
     return 1;
 }
 // END DE-Crypting
 
 
-int Verifyhash(unsigned char *hash,unsigned char *cryptbuffer,int debugout){
+int Verifyhash(unsigned char *hash,unsigned char *decryptBuffer,int debugout){
 
+  unsigned char cmphash[20];
   int a;
+  int zero_position = 20; 
+  
+  // Convert Hash to "Big-Endian Format"
+  for (a=0;a<20;a++) cmphash[a] = hash[19-a];
+  
   if (debugout!=0) {
 	
-        printf("Real Header Hash:      ");
-        for (a=0;a<20;a++) printf("%02X",hash[a]);
-        printf("\nHash from RSA:         ");
-        for (a=236;a<256;a++) printf("%02X",cryptbuffer[a]);
-        printf("\n");
+        printf("\n             in File -> ");
+        for (a=0;a<20;a++) printf("%02X",decryptBuffer[a]);
+        printf("\n           should be -> ");
+        for (a=0;a<20;a++) printf("%02X",cmphash[a]);
+
+        printf("\n");   
+        if (decryptBuffer[zero_position]!= 0x00) 
+  		printf("Padding Step 1:        fail\n"); else printf("Padding Step 1:        pass\n");
+  	
+  	if (decryptBuffer[xePublicKeyData.ModulusSize]!= 0x00) 
+  		printf("Padding Step 2:        fail\n"); else printf("Padding Step 2:        pass\n");
+  
+  	if (decryptBuffer[xePublicKeyData.ModulusSize-1]!= 0x01) 
+  		printf("Padding Step 3:        fail\n"); else printf("Padding Step 3:        pass\n");
+  
+  	for (unsigned int i = zero_position+1; i < (xePublicKeyData.ModulusSize-1); i++) {
+		if (decryptBuffer[i] != 0xff) 	{ 
+			printf("Padding Step 4:        fail\n"); 
+			break; 
+		}       
+	if (i==xePublicKeyData.ModulusSize-2) printf("Padding Step 4:        pass\n");
+
+  	}   
+        
   }
 
-  for (int a=0;a<20;a++) {
+  // Compare if the Hash Results (first 20 Bytes) are the same
+  if (memcmp(decryptBuffer, cmphash, 20)!=0)   return 0;
+
   
-    	if (cryptbuffer[a+236]!=hash[a]) {
-    		// Does not match
-    		return 0;	
-  	}
+
+/*
+  // Here, an additional Padding Option could be insered (OID padding Type objects)
+  // This version does not work, and does not affect security in any way, 
+  // i left it out as i have 0 knowledge of how to do it
+  
+  unsigned int *p;
+  unsigned char paddingtable[][]=?;
+  
+  for (int tableIndex = 0; paddingtable[tableIndex][0] != 0; tableIndex++) {
+	
+	p* = paddingtable[tableIndex];
+        int difference = memcmp(p + 1, decryptBuffer + 5*4, *p);
+
+	if (!difference)
+	{
+		zero_position = *p + 5 * 4;
+		break;
+	}
   }
-  /* 
-   Padding checking , brutal, but xbox does the same in concept
-  */
+*/	
+	  
+  // Padding checking , xbox does exactly the same 
   
-  if (cryptbuffer[0]!= 0x00) return 0;
-  if (cryptbuffer[1]!= 0x01) return 0;
-  if (cryptbuffer[235]!= 0x00) return 0;
-  for (a=2;a<235;a++) if (cryptbuffer[a]!= 0xFF) return 0;
+  if (decryptBuffer[zero_position]!= 0x00) 
+  	return 0;
+  	
+  if (decryptBuffer[xePublicKeyData.ModulusSize]!= 0x00) 
+  	return 0;
+  
+  if (decryptBuffer[xePublicKeyData.ModulusSize-1]!= 0x01) 
+  	return 0;
+  
+  for (unsigned int i = zero_position+1; i < (xePublicKeyData.ModulusSize-1); i++) {
+	if (decryptBuffer[i] != 0xff) return 0;
+	//printf("%02X",decryptBuffer[i])  ;
+  }  
+
+
   return 1;
   
 }

@@ -32,7 +32,8 @@ int validatexbe(char *filename,unsigned int option_flag){
 //    int warn;
     int i;
     void *xbe;
-    
+    int fail=0;
+        
     XBE_HEADER *header;
     XBE_CERTIFICATE *cert;
     XBE_SECTION *sechdr;
@@ -68,15 +69,15 @@ int validatexbe(char *filename,unsigned int option_flag){
 	 
        	 // If the magic value XBEH is not present, error
 	printf("Magic XBEH value:      ");
-	if (memcmp(header->Magic, "XBEH", 4)==0) { printf("pass\n"); } else { printf("fail\n"); }
+	if (memcmp(header->Magic, "XBEH", 4)==0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 	
 	// If the header has the correct size, error ???  
 	printf("Header Size:           ");
-	if (header->XbeHeaderSize == 0x178) { printf("pass\n"); } else { printf("fail\n"); }
+	if (header->XbeHeaderSize == 0x178) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 		
 	// If the image base is not 00010000,
 	printf("Image Base Address:    ");
-	if (((int)header->BaseAddress)== 0x10000)  { printf("pass\n"); } else { printf("fail\n"); }
+	if (((int)header->BaseAddress)== 0x10000)  { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 	
 	//eax = header->HeaderSize;
 	eax = header->XbeHeaderSize;
@@ -84,21 +85,21 @@ int validatexbe(char *filename,unsigned int option_flag){
 	
 	// Validates the Certificate Entry Address 
 	printf("Certificate Adress:    ");
-	if (eax == (int)header->Certificate) { printf("pass\n"); } else { printf("fail\n"); }
+	if (eax == (int)header->Certificate) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 
 	printf("Certificate Size  :    ");
 	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
-	if (cert->Size==0x1d0) { printf("pass\n"); } else { printf("fail\n"); }
+	if (cert->Size==0x1d0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 		
 	// Validates the Section Header Address 
 	printf("Section Address:       ");
 	eax +=0x1D0;
-	if (eax == (int)header->Sections) { printf("pass\n"); } else { printf("fail\n"); }
+	if (eax == (int)header->Sections) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 	
 
 	// Check, that Debug Address is not set
 	printf("Debug Address:         ");
-	if ((int)header->DebugImportTable== 0) { printf("pass\n"); } else { printf("fail\n"); }
+	if ((int)header->DebugImportTable== 0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 
 	// XOR Entry Address
 	//header->EntryPoint = (void *)((int) header->EntryPoint ^0xA8FC57AB); 
@@ -118,15 +119,16 @@ int validatexbe(char *filename,unsigned int option_flag){
 	  	
 	  	if (memcmp(&sha_Message_Digest[0],&sechdr->ShaHash[0],20)==0) {
 	  		 printf("pass"); 
-		} else { 
+		} else {       
+			fail=1; 
 			printf("fail"); 
 		}
 
 	  	// Debug Message D1
 	  	if (option_flag & 0x01000000) {
-	  		printf(" O: "); 
+	  		printf("\n             in File -> "); 
 	  		for (int a=0;a<20;a++) printf("%02x",sechdr->ShaHash[a]);
-	  		printf(" C: "); 
+	  		printf("\n           should be -> "); 
 	  		for (int a=0;a<20;a++) printf("%02x",sha_Message_Digest[a]);
 	  	
 	  	}
@@ -142,22 +144,28 @@ int validatexbe(char *filename,unsigned int option_flag){
 	
 	printf("2048 RSA Signature:    ");
 	if (VerifySignaturex(xbe,0)== 1) { 
-		printf("pass\n"); 
+		printf("pass"); 
 		// Debug Message D1
 	  	if (option_flag & 0x01000000) {
 			VerifySignaturex(xbe,1);
 		}
 	} else { 
-		printf("fail\n"); 
-		VerifySignaturex(xbe,1);
+		fail=1; 
+		printf("fail"); 
+	  	if (option_flag & 0x01000000) {
+			VerifySignaturex(xbe,1);
+		}
 		if (option_flag & 0x00080000) {
 			printf("Correcting Signature:\n"); 
 			GenarateSignaturex(xbe);
 			
 		}
-		
-		
-	}
+	}                   
+	
+
+	printf("\n");
+	
+	if (fail==0) printf("\nXBE file integrity:    OK\n"); else  printf("\nXBE file integrity:    FALSE !!!!!!! FALSE !!!!!\n");
 	
 	if (option_flag & 0x00020000){
 	 f = fopen("out.xbe", "w");
