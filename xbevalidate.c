@@ -133,6 +133,13 @@ int validatexbe(char *filename,unsigned int option_flag){
 	} else { 
 		printf("fail\n"); 
 		VerifySignaturex(xbe,1);
+		if (option_flag & 0x00080000) {
+			printf("Correcting Signature:\n"); 
+			GenarateSignaturex(xbe);
+			
+		}
+		
+		
 	}
 	
 	if (option_flag & 0x00020000){

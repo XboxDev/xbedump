@@ -21,38 +21,65 @@
 #include <string.h>
 
 #include "xbestructure.h"
+#include "xboxlib.h"
 
 
 void usage(){
 	
-	printf("(C)2002 Franz Lehner franz@caos.at\n(C)2002 Michael Steil mist@c64.org\n\n");	
+ printf("\n"	
 	 
-	printf("  Usage:    xbe [xbefile] [options]\n\n");
-	       
-	printf("   -da          Dumps the compleate XBE Header Structure\n");
-	printf("   -dh          Dumps the Header info\n");
-	printf("   -dc          Dumps the Certificate\n");
-	printf("   -ds          Dumps the Sections\n");
-	printf("   -dl          Dumps the Libary Sections\n\n");
-	       
-	printf("   -vh          Verifies the Section Hash\n");
-	printf("   -wb          Writes back the update to file out.xbe \n\n");
-	printf("\n  For checking the RSA 2048 bit Signature,\n  you need the original decompressed Flash stored in flash.bin in the same directory \n");
-	printf("\n  Note: this code will work on little-endian 32-bit machines only! \n  Take an old Pentium\n\n");
+	"  Usage:    xbe [xbefile] [options]\n\n"
+	
+	"   -da          Dumps the compleate XBE Header Structure\n"
+	"   -dh          Dumps the Header info\n"
+	"   -dc          Dumps the Certificate\n"
+	"   -ds          Dumps the Sections\n"
+	"   -dl          Dumps the Libary Sections\n\n"
+	
+	"   -vh          Verifies the Section Hash\n"
+	"   -wb          Writes back the update to file out.xbe \n\n"
+	
+	"   -sm          Uses Microsoft Signature (default mode)\n"
+	"                (Note: Signing not possible, as we do not have the private key)\n"
+	"   -st          Uses the Test Keys i have created .. leaves the XOR unchanged\n\n"
+	
+	"  ---- Special Options -----\n\n"
+	"   -sign        Special Option, Signes the xbe with the key who is stored in the xboxlib.c\n"
+	"                Leaves the XOR unchanged\n\n"
+	
+	"  Note:         This code will work on little-endian 32-bit machines only! \n\n"
+	"                For working with this programm ,you need the original decompressed and decrypted Flash \n"
+	"                stored in flash.bin in the same directory \n\n"
+	
+	"  Credits to \n"
+	"      Andy Green andy@warmcat.com \n"
+	"      Michael Steil mist@c64.org for writing the excellent original xbedumper\n"
+	"      Asterix\n"
+	"      All other freaks who helped\n\n"
+
+	
+	"  (C)2002 by Franz Lehner franz@caos.at\n");
 	
 	
 }
 
 int main (int argc, const char * argv[])
 {
-  int counter;
+  	int counter=0;
 	unsigned int dumpflag=0;
 	char filename[512];
-
-	printf("XBE Dumper 0.3b  (C)2002 Franz Lehner franz@caos.at\n                 based on XBE validator by Michael Steil\n\n");
+	int verifyagain=0;
+	printf("XBE Dumper 0.3b\n");
 
 //      dumpxbe("secret/xboxdash.xbe");
       //validatexbe("secret/xboxdash.xbe");
+	if (argc == 2) {
+		if (strcmp(argv[1],"--test")==0) { 
+		//int gen_linux_rsadata();
+		//gen_linux_rsadata();
+			return 0; 
+		}
+	}
 
 	if (argc > 2) {
 
@@ -60,19 +87,46 @@ int main (int argc, const char * argv[])
 
  	  	for (counter=2;counter<argc;counter++){
    	
-		if (strcmp(argv[counter],"-da")==0)  dumpflag |= 0x0000ffff;
+		if (strcmp(argv[counter],"-da")==0)  dumpflag |= 0x000000ff;
  	  	if (strcmp(argv[counter],"-dh")==0)  dumpflag |= 0x00000001;
  	  	if (strcmp(argv[counter],"-dc")==0)  dumpflag |= 0x00000002;
  	  	if (strcmp(argv[counter],"-ds")==0)  dumpflag |= 0x00000004;
 		if (strcmp(argv[counter],"-dl")==0)  dumpflag |= 0x00000008;
-
+		
+		if (strcmp(argv[counter],"-sm")==0)  dumpflag |= 0x00000000;
+		if (strcmp(argv[counter],"-st")==0)  dumpflag |= 0x10000000;
+				
 		if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
  		if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
-
+		
+		if (strcmp(argv[counter],"-sign")==0) { 
+				dumpflag=0;
+				dumpflag |= 0x00010000;  // Verify Header
+				dumpflag |= 0x00020000;  // Write Back
+				dumpflag |= 0x00040000;  // Generate Certificate
+				dumpflag |= 0x00080000;  // Generate Signature
+				dumpflag |= 0x10000000;  // Use Linux Test Keys
+				verifyagain=1;
+			}
+			
 		}
 
-		if (dumpflag & 0x0000FFFF) dumpxbe(&filename[0],dumpflag);
-		if (dumpflag & 0xffff0000) validatexbe(&filename[0],dumpflag);
+		read_rsafromflash("flash.bin",dumpflag);
+		
+		if (dumpflag & 0x00000FFF) dumpxbe(&filename[0],dumpflag);
+		if (dumpflag & 0x0fff0000) validatexbe(&filename[0],dumpflag);
+		// Verify the signed file
+		
+		if (verifyagain==1) { 
+				dumpflag=0;
+				dumpflag |= 0x00010000;  // Verify Header
+				dumpflag |= 0x10000000;  // Use Linux Test Keys
+				strcpy(&filename[0],"out.xbe");
+				printf("\n File out.xbe created, verifying it ...\n\n");
+				validatexbe(&filename[0],dumpflag);
+			}
+		
+		
 
 	} else {
 

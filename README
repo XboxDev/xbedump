@@ -1,4 +1,4 @@
-XBE Dumper 0.3a
+XBE Dumper 0.3c
 ---------------
 
 by franz@caos.at, based on the original XBE
@@ -8,16 +8,17 @@ by franz@caos.at, based on the original XBE
 The XBE dumper is now in the process of being enhanced to perform
 the same crypto operations on the XBE file as the Xbox kernel itself,
 using the same algorithms.
+(except the Certificate check, but i work on it now)
 
 The XBE signing process is in two stages.  In Stage one, a SHA-1 hash of
 the contents of each XBE section is made and the hash stored in a table
 in the XBE header section.  In stage 2, a single SHA-1 hash is made of
 the header region (including the section hashes and a signer certificate),
-the resulting single hash is then itself encrypted with strong 1024-bit
+the resulting single hash is then itself encrypted with strong 2048-bit
 RSA public/private key encryption and the resulting encrypted single hash
 ''signature'' stored near the start of the final, signed XBE file.
 
-In this release, the action of the first stage is implemented, so that
+In this release, the action of the first& second stage is implemented, so that
 the software is able to compute and store in the header SHA-1 hashes
 for each section in the unsigned XBE.  It is also able to confirm that
 the hashes stored in the header are correct for the corresponding section
@@ -30,6 +31,18 @@ create a signed XBE can be reliably and rapidly assessed without using
 any Microsoft code.  In the other direction, it is intended to have proven
 all of the code needed to sign XBEs given a valid signer certificate and
 the correct private key (which we of course lack at the moment).
+
+Additionally, this Software gives us the oportunity to make "cleaner" xbe's
+as the patching of Kernel (done by mod_chips) is reduced, and only the real
+Verify signature has to be "adapted".
+
+There are 2 additional key's in the source, these are key's build with my computer.
+The keys are test keys and do not work on "real" xboxes.
+We have agreed not to publish the MS$ public key in the CVS, as this would be a copyright
+problem. You have to copy a decryped and decompressed flash to the same directory, 
+the programm is working in.
+
+Please refeer to the Help in the programm itself for operations.
 
 
 Installation
@@ -57,22 +70,6 @@ these bogus "undefined reference to `__gxx_personality_v0'"
 errors uncomment the definition of this symbol in xbe.c and
 remake.
 
-Usage
------
-
-./xbedump <xbe filepath> [<switches>...]
-
-valid switches are:
-
-   -da          Dumps the compleate XBE Header Structure
-                ( same as -dh -dc -ds -dl )
-   -dh          Dumps the Header info
-   -dc          Dumps the Certificate
-   -ds          Dumps the Sections
-   -dl          Dumps the Libary Sections
-
-   -vh          Verifies the Section Hash
-   -wb          Writes back the update to file out.xbe
 
 
 Changelog
@@ -80,5 +77,8 @@ Changelog
 
 0.2b Franz has added code to verify the signature
 0.2a Franz started on adding crypto structure code
+0.3a Mismatch of Andy and Franz checking, now learned to work with CVS
+0.3b Checking the RSA signature + update sections hashes
+0.3c Generation of a "custom signature" implemented
 
-(this document by andy@warmcat.com  2002-10-18)
+(this document by andy@warmcat.com & franz@caos.at)
