@@ -9,6 +9,7 @@
  *                                                                         *
  ***************************************************************************/
 
+
 #include <errno.h>
 #include <stdio.h>
 
@@ -285,7 +286,7 @@ if (option_flag & 0x00000002) {
              printf("SHA1 hash:\n\t"); 
              
              for (a=0;a<20;a++) printf("%02X",sechdr->ShaHash[a]);
-}
+}           
        /*    shax(&sha_Message_Digest[0], xbe+(int)sechdr->FileAddress ,sechdr->FileSize);
              printf("\nSHA1 hash: calculated \n\t");
              for (a=0;a<20;a++) printf("%02X",sha_Message_Digest[a]);*/

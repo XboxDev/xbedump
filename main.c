@@ -22,7 +22,6 @@
 
 #include "xbestructure.h"
 
-// unsigned int __gxx_personality_v0 =0;  // you may need to define this to get it to compile with GCC3.2
 
 void usage(){
 
@@ -50,7 +49,7 @@ int main (int argc, const char * argv[])
 	unsigned int dumpflag=0;
 	char filename[512];
 
-	printf("XBE Dumper 0.2a  (C)2002 Franz Lehner franz@caos.at\n                 based on XBE validator by Michael Steil\n\n");
+	printf("XBE Dumper 0.2b  (C)2002 Franz Lehner franz@caos.at\n                 based on XBE validator by Michael Steil\n\n");
 
 //      dumpxbe("secret/xboxdash.xbe");
       //validatexbe("secret/xboxdash.xbe");
@@ -59,16 +58,16 @@ int main (int argc, const char * argv[])
 
 		strcpy(&filename[0],argv[1]);
 
-   	for (counter=2;counter<argc;counter++){
+ 	  	for (counter=2;counter<argc;counter++){
    	
-			if (strcmp(argv[counter],"-da")==0)  dumpflag |= 0x0000ffff;
+		if (strcmp(argv[counter],"-da")==0)  dumpflag |= 0x0000ffff;
  	  	if (strcmp(argv[counter],"-dh")==0)  dumpflag |= 0x00000001;
  	  	if (strcmp(argv[counter],"-dc")==0)  dumpflag |= 0x00000002;
  	  	if (strcmp(argv[counter],"-ds")==0)  dumpflag |= 0x00000004;
- 	  	if (strcmp(argv[counter],"-dl")==0)  dumpflag |= 0x00000008;
+		if (strcmp(argv[counter],"-dl")==0)  dumpflag |= 0x00000008;
 
-			if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
- 			if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
+		if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
+ 		if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
 
 		}
 

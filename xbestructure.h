@@ -1,3 +1,6 @@
+// XBE stuff
+// Not used in any exported kernel calls, but still useful.
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -6,11 +9,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-
-
-// XBE stuff
-// Not used in any exported kernel calls, but still useful.
 
 
 // XBE header information
@@ -202,10 +200,7 @@ typedef struct _XBE_LIBRARY {
 #define XBE_SEC_RO_HEAD_PAGE            0x00000010
 #define XBE_SEC_RO_TAIL_PAGE            0x00000020
 
-
-///////////////////////////////////////
-// exports
-
-int dumpxbe (char *filename,unsigned int option_flag);
-int validatexbe(char *filename,unsigned int option_flag);
 void shax(unsigned char *result, unsigned char *data, unsigned int len);
+int validatexbe(char *filename,unsigned int option_flag);
+int dumpxbe (char *filename,unsigned int option_flag);
+

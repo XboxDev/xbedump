@@ -1,4 +1,4 @@
-XBE Dumper 0.2a
+XBE Dumper 0.2b
 ---------------
 
 by franz@caos.at, based on the original XBE
@@ -60,7 +60,7 @@ remake.
 Usage
 -----
 
-./xbe <xbe filepath> [<switches>...]
+./xbedump <xbe filepath> [<switches>...]
 
 valid switches are:
 
@@ -75,5 +75,10 @@ valid switches are:
    -wb          Writes back the update to file out.xbe
 
 
+Changelog
+---------
 
-(this document by andy@warmcat.com  2002-10-07)
+0.2b Franz has added code to verify the signature
+0.2a Franz started on adding crypto structure code
+
+(this document by andy@warmcat.com  2002-10-18)

@@ -1,3 +1,7 @@
+/* Note: this code will work on little-endian 32-bit machines only! */
+#include <errno.h>
+#include <stdio.h>
+
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -7,10 +11,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
-/* Note: this code will work on little-endian 32-bit machines only! */
-#include <errno.h>
-#include <stdio.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -28,6 +28,7 @@
 int validatexbe(char *filename,unsigned int option_flag){
     FILE *f;
     int filesize;
+//    int warn;
     int i;
     void *xbe;
     void *correct_xbe;
@@ -35,7 +36,13 @@ int validatexbe(char *filename,unsigned int option_flag){
     XBE_HEADER *header;
     XBE_CERTIFICATE *cert;
     XBE_SECTION *sechdr,*corr_secdr;
+ //   XBE_TLS *tls;
+ //   XBE_LIBRARY *lib;
+//    unsigned char sha1hashout[20];
+//    unsigned char md5hashout[16];
 
+//    unsigned int EntryPoint;
+//    unsigned int KernelThunkTable;
     unsigned char sha_Message_Digest[20];
     int eax;
     
@@ -44,62 +51,62 @@ int validatexbe(char *filename,unsigned int option_flag){
 
 /* read file */
     f = fopen(filename, "r");
-    if (f!=NULL)
-    {
+    if (f!=NULL) 
+    {    
         fseek(f, 0, SEEK_END); filesize = ftell(f); fseek(f, 0, SEEK_SET);
         xbe = malloc(filesize);
         correct_xbe = malloc(filesize);
-
+         
         fread(xbe, 1, filesize, f);
         memcpy(correct_xbe, xbe, filesize);
-
+         
         fclose(f);
-
+       
         printf("Validating file %s (%i bytes)\n", filename, filesize);
 
-				header = (XBE_HEADER*) xbe;
+	header = (XBE_HEADER*) xbe;
+	 
+       	 // If the magic value XBEH is not present, error
+	printf("Magic XBEH value:      ");
+	if (memcmp(header->Magic, "XBEH", 4)==0) { printf("pass\n"); } else { printf("fail\n"); }
+	
+	// If the header has the correct size, error ???  
+	printf("Header Size:           ");
+	if (header->XbeHeaderSize == 0x178) { printf("pass\n"); } else { printf("fail\n"); }
+		
+	// If the image base is not 00010000,
+	printf("Image Base Address:    ");
+	if (((int)header->BaseAddress)== 0x10000)  { printf("pass\n"); } else { printf("fail\n"); }
+	
+	//eax = header->HeaderSize;
+	eax = header->XbeHeaderSize;
+	eax += 0x10000;
+	
+	// Validates the Certificate Entry Address 
+	printf("Certificate Adress:    ");
+	if (eax == (int)header->Certificate) { printf("pass\n"); } else { printf("fail\n"); }
 
-							// If the magic value XBEH is not present, error
-				printf("Magic XBEH value:      ");
-				if (memcmp(header->Magic, "XBEH", 4)==0) { printf("pass\n"); } else { printf("fail\n"); }
+	printf("Certificate Size  :    ");
+	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
+	if (cert->Size==0x1d0) { printf("pass\n"); } else { printf("fail\n"); }
+		
+	// Validates the Section Header Address 
+	printf("Section Address:       ");
+	eax +=0x1D0;
+	if (eax == (int)header->Sections) { printf("pass\n"); } else { printf("fail\n"); }
+	
 
-				// If the header has the correct size, error ???
-				printf("Header Size:           ");
-				if (header->XbeHeaderSize == 0x178) { printf("pass\n"); } else { printf("fail\n"); }
+	// Check, that Debug Address is not set
+	printf("Debug Address:         ");
+	if ((int)header->DebugImportTable== 0) { printf("pass\n"); } else { printf("fail\n"); }
 
-				// If the image base is not 00010000,
-				printf("Image Base Address:    ");
-				if (((int)header->BaseAddress)== 0x10000)  { printf("pass\n"); } else { printf("fail\n"); }
-
-				//eax = header->HeaderSize;
-				eax = header->XbeHeaderSize;
-				eax += 0x10000;
-
-				// Validates the Certificate Entry Address
-				printf("Certificate Adress:    ");
-				if (eax == (int)header->Certificate) { printf("pass\n"); } else { printf("fail\n"); }
-
-				printf("Certificate Size  :    ");
-				cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
-				if (cert->Size==0x1d0) { printf("pass\n"); } else { printf("fail\n"); }
-
-				// Validates the Section Header Address
-				printf("Section Address:       ");
-				eax +=0x1D0;
-				if (eax == (int)header->Sections) { printf("pass\n"); } else { printf("fail\n"); }
-
-
-			// Check, that Debug Address is not set
-			printf("Debug Address:         ");
-			if ((int)header->DebugImportTable== 0) { printf("pass\n"); } else { printf("fail\n"); }
-
-			// XOR Entry Address
-			header->EntryPoint = (void *)((int) header->EntryPoint ^0xA8FC57AB);
-			// XOR Kernel Image thunk Address
-			header->KernelThunkTable = (unsigned int *)((int) header->KernelThunkTable ^ 0x5B6D40B6);
-			printf("Kernel Entry:          %08X\n",(int)header->EntryPoint);
-			printf("Kernel Thunk Table:    %08X\n",(int)header->KernelThunkTable);
-			// Check the Hash of the Sections
+	// XOR Entry Address
+	header->EntryPoint = (void *)((int) header->EntryPoint ^0xA8FC57AB); 
+	// XOR Kernel Image thunk Address
+	header->KernelThunkTable = (unsigned int *)((int) header->KernelThunkTable ^ 0x5B6D40B6);
+	printf("Kernel Entry:          %08X\n",(int)header->EntryPoint);
+	printf("Kernel Thunk Table:    %08X\n",(int)header->KernelThunkTable);
+	// Check the Hash of the Sections
          sechdr = (XBE_SECTION *)(((char *)xbe) + (int)header->Sections - (int)header->BaseAddress);
     	 
     	 corr_secdr = (XBE_SECTION *)(((char *)correct_xbe) + (int)header->Sections - (int)header->BaseAddress);
@@ -119,19 +126,20 @@ int validatexbe(char *filename,unsigned int option_flag){
 		}
 		printf("\n"); 
 		}
-
-	 }
-
-		if (option_flag & 0x00020000){
-			f = fopen("out.xbe", "w");
-			fwrite(correct_xbe, 1, filesize, f);
-			fclose(f);
-		}
-
-		free(xbe);
-		free(correct_xbe);
-
-  }
+	
+	 }	
+	
+	if (option_flag & 0x00020000){
+	 f = fopen("out.xbe", "w");
+	 fwrite(correct_xbe, 1, filesize, f);
+         
+         fclose(f);	
+		
+	}
+	free(xbe);
+	free(correct_xbe);
+	
+    }
 	return 0;
 }
 
