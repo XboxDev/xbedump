@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include "xboxlib.h"
 #include "xbestructure.h"
@@ -110,8 +111,82 @@ typedef struct RSA_PUBLIC_KEY
 	unsigned char Modulus[256];     // Bit endian style
 	unsigned char Privatekey[256];  // Private Key .. we do not have it -- Big endian style
 };
-
 struct RSA_PUBLIC_KEY xePublicKeyData;
+
+// Asterix .bin File format structure
+typedef struct XboxKey
+{
+	// Magic string ("RSA1")
+	uint8_t magic[4];
+	// Size of key?  Always 0x108
+	uint32_t byte_size;
+	// Bit size of key?  Always 2048
+	uint32_t bit_size;
+	// Unknown; always 0xFF
+	uint32_t unknown_FF;
+	// Public exponent, always 65537
+	uint32_t public_exponent;
+	// modulus, which is factor1 * factor2
+	uint8_t modulus[256];
+
+	// Private portions (these are kept secret to the Xbox Linux team)
+
+	// First factor of the modulus
+	uint8_t factor1[128];
+	// Second factor of the modulus
+	uint8_t factor2[128];
+	// Random number used to make factor1 (factor1 = nextprime(random1))
+	uint8_t random1[128];
+	// Random number used to make factor2 (factor2 = nextprime(random2))
+	uint8_t random2[128];
+	// "Phi", which is (factor1 - 1) * (factor2 - 1)
+	uint8_t phi[256];
+	// Private exponent, which is 65537^-1 mod phi
+	uint8_t private_exponent[256];
+};
+
+const unsigned char RSApkcs1paddingtable[3][16] = {
+	{0x0F, 0x14,0x04,0x00,0x05,0x1A,0x02,0x03,0x0E,0x2B,0x05,0x06,0x09,0x30,0x21,0x30},
+	{0x0D, 0x14,0x04,0x1A,0x02,0x03,0x0E,0x2B,0x05,0x06,0x07,0x30,0x1F,0x30,0x00,0x00},
+	{0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
+};
+
+
+int read_rsafrombin_asterix()
+{
+	FILE *f;
+	unsigned char *flash=0;
+	int filesize=0;
+	
+	struct XboxKey tempkey;
+	
+	printf("Using Linux Test Keys from linuxkey.bin\n");
+	//memcpy(&xePublicKeyData,&Testkey[0],20+256+256);
+
+	f = fopen("linuxkey.bin", "r");
+    	if (f!=NULL) 
+    	{    
+        	fseek(f, 0, SEEK_END); 
+		filesize = ftell(f); 
+		fseek(f, 0, SEEK_SET);
+        	
+        	flash = (unsigned char*) malloc(filesize);
+        	
+		fread(flash, 1, filesize, f);
+ 	        fclose(f);
+		printf("Key File loaded (format asterix): %d bytes",filesize);
+	} else printf("linuxkey.bin not found");
+	
+	memcpy(&tempkey,&flash[0],filesize);
+    	
+	
+	memcpy(&xePublicKeyData.Modulus[0],tempkey.modulus,256);
+	memcpy(&xePublicKeyData.Privatekey[0],tempkey.private_exponent,256);
+	
+	//memcpy(&xePublicKeyData,&Testkey[0],20+256+256);
+	return 0;
+}     
+
 
 // DE - Crypting
 int decrypt_signature(unsigned char *c_number,unsigned char *cryptbuffer){
@@ -223,28 +298,19 @@ int Verifyhash(unsigned char *hash,unsigned char *decryptBuffer,int debugout){
   // Compare if the Hash Results (first 20 Bytes) are the same
   if (memcmp(decryptBuffer, cmphash, 20)!=0)   return 0;
 
-  
-
-/*
-  // Here, an additional Padding Option could be insered (OID padding Type objects)
-  // This version does not work, and does not affect security in any way, 
-  // i left it out as i have 0 knowledge of how to do it
-  
-  unsigned int *p;
-  unsigned char paddingtable[][]=?;
-  
-  for (int tableIndex = 0; paddingtable[tableIndex][0] != 0; tableIndex++) {
-	
-	p* = paddingtable[tableIndex];
-        int difference = memcmp(p + 1, decryptBuffer + 5*4, *p);
-
-	if (!difference)
+  unsigned char *pkcspad;
+  for (int tableIndex = 0; RSApkcs1paddingtable[tableIndex][0] !=0; tableIndex++) {
+  	
+  	pkcspad=(unsigned char*)RSApkcs1paddingtable[tableIndex];
+  	int difference = memcmp(pkcspad+1,&decryptBuffer[20],*pkcspad); 
+  	
+  	if (!difference)
 	{
-		zero_position = *p + 5 * 4;
+		zero_position = *pkcspad + 20;
 		break;
 	}
+  
   }
-*/	
 	  
   // Padding checking , xbox does exactly the same 
   
@@ -280,21 +346,39 @@ int crypt_signature(unsigned char *c_number,unsigned char *cryptbuffer){
     unsigned char c_private[256];
     unsigned char d_private[256];
     unsigned char d_number[256];
-    
+    unsigned char c_signature[256];
+    unsigned char c_hash[20];
+    unsigned int a;
+        
     memcpy(&c_modulo,xePublicKeyData.Modulus,256);
     memcpy(&c_private,xePublicKeyData.Privatekey,256);
     
-    // convert from Intel Big Endian Format
+    // Reverse Public Modulus
     for (count=0;count<256;count++) d_modulo[count]=c_modulo[255-count];
-   // for (count=0;count<256;count++) d_number[count]=c_number[255-count];
+    // Reverse Private Key
     for (count=0;count<256;count++) d_private[count]=c_private[255-count];
+    // Reverse Hash
+    for (count=0;count<20;count++) c_hash[count]=c_number[19-count];
     
+    int zero_position=20;
     // Message Padding 
-    d_number[0]=0x00;
-    d_number[1]=0x01;
-    d_number[235]=0x00;
-    for (int a=2;a<235;a++) d_number[a]=0xFF;
-    for (int a=0;a<20;a++) d_number[a+236]=c_number[a];
+    c_signature[xePublicKeyData.ModulusSize]=0x00;
+    c_signature[xePublicKeyData.ModulusSize-1]=0x01;
+    memcpy(&c_signature[0],&c_hash[0],20);
+ 
+    int padmethod=2;        
+    memcpy(&c_signature[20],&RSApkcs1paddingtable[padmethod][1],RSApkcs1paddingtable[padmethod][0]);
+    zero_position += RSApkcs1paddingtable[padmethod][0];
+
+    c_signature[zero_position]=0x00;   
+    for (a=zero_position+1;a<(xePublicKeyData.ModulusSize-1);a++) c_signature[a]=0xFF;
+ 
+ 
+
+    // Reverse Signature for Crypting again
+    for (count=0;count<256;count++) d_number[count]=c_signature[255-count];
+    
+  //  for (a=0;a<256;a++) printf("%02X",d_number[a]);  
     
     
     ctx=BN_CTX_new();
@@ -430,6 +514,9 @@ int load_rsa(unsigned int dumpflag)
 	};
 	
 	memcpy(&xePublicKeyData,&xboxPublicKeyData[0],20+256);
+	
+	//int read_rsafrombin_asterix();
+	//read_rsafrombin_asterix();
 	
 	return 0;
 }
