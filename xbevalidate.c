@@ -115,21 +115,38 @@ int validatexbe(char *filename,unsigned int option_flag){
 	  	
 	  	printf("Section: %2d Hash:      ",i);
 	  	
-	  	if (memcmp(&sha_Message_Digest[0],&sechdr->ShaHash[0],20)==0) { printf("pass\n"); 
+	  	
+	  	if (memcmp(&sha_Message_Digest[0],&sechdr->ShaHash[0],20)==0) {
+	  		 printf("pass"); 
 		} else { 
-		printf("fail"); 
+			printf("fail"); 
+		}
+
+	  	// Debug Message D1
+	  	if (option_flag & 0x01000000) {
+	  		printf(" O: "); 
+	  		for (int a=0;a<20;a++) printf("%02x",sechdr->ShaHash[a]);
+	  		printf(" C: "); 
+	  		for (int a=0;a<20;a++) printf("%02x",sha_Message_Digest[a]);
+	  	
+	  	}
+		
+		// Correct it, if Correct Bit Set
 		if (option_flag & 0x00020000) {
 			memcpy(&sechdr->ShaHash[0],&sha_Message_Digest[0],20);
 			printf(" -> corrected"); 
 		}
-		printf("\n"); 
-		}
 	
+		printf("\n"); 
 	 }	
 	
 	printf("2048 RSA Signature:    ");
 	if (VerifySignaturex(xbe,0)== 1) { 
 		printf("pass\n"); 
+		// Debug Message D1
+	  	if (option_flag & 0x01000000) {
+			VerifySignaturex(xbe,1);
+		}
 	} else { 
 		printf("fail\n"); 
 		VerifySignaturex(xbe,1);

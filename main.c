@@ -36,12 +36,14 @@ void usage(){
 	"   -ds          Dumps the Sections\n"
 	"   -dl          Dumps the Libary Sections\n\n"
 	
-	"   -vh          Verifies the Section Hash\n"
+	"   -vh          Verifies the .xbe Header \n"
 	"   -wb          Writes back the update to file out.xbe \n\n"
 	
 	"   -sm          Uses Microsoft Signature (default mode)\n"
 	"                (Note: Signing not possible, as we do not have the private key)\n"
 	"   -st          Uses the Test Keys i have created .. leaves the XOR unchanged\n\n"
+	
+	"   -d1          Debugoutput for option -vh\n\n"
 	
 	"  ---- Special Options -----\n\n"
 	"   -sign        Special Option, Signes the xbe with the key who is stored in the xboxlib.c\n"
@@ -49,8 +51,6 @@ void usage(){
 	"   ?            Display Help\n\n"
 	
 	"  Note:         This code will work on little-endian 32-bit machines only! \n\n"
-	"                For working with this programm ,you need the original decompressed and decrypted Flash \n"
-	"                stored in flash.bin in the same directory \n\n"
 	
 	"  Credits to \n"
 	"      Andy Green andy@warmcat.com \n"
@@ -59,7 +59,7 @@ void usage(){
 	"      All other freaks who helped\n\n"
 
 	
-	"  (C)2002 by Franz Lehner franz@caos.at\n");
+	"  (C)2002,2003 by Franz Lehner franz@caos.at (hamtitampti)\n");
 	
 	
 }
@@ -99,6 +99,9 @@ int main (int argc, const char * argv[])
 				
 		if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
  		if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
+ 		
+ 		if (strcmp(argv[counter],"-d1")==0)  dumpflag |= 0x01000000;
+ 		
  		if (strcmp(argv[counter],"?")==0)  {
  				usage();
  				return 0;
@@ -116,7 +119,8 @@ int main (int argc, const char * argv[])
 			
 		}
 
-		read_rsafromflash("flash.bin",dumpflag);
+		//read_rsafromflash("flash.bin",dumpflag);
+		load_rsa(dumpflag);
 		
 		if (dumpflag & 0x00000FFF) dumpxbe(&filename[0],dumpflag);
 		if (dumpflag & 0x0fff0000) validatexbe(&filename[0],dumpflag);
