@@ -1,4 +1,4 @@
-XBE Dumper 0.3c
+XBE Dumper 0.4
 ---------------
 
 by franz@caos.at, based on the original XBE
@@ -8,7 +8,6 @@ by franz@caos.at, based on the original XBE
 The XBE dumper is now in the process of being enhanced to perform
 the same crypto operations on the XBE file as the Xbox kernel itself,
 using the same algorithms.
-(except the Certificate check, but i work on it now)
 
 The XBE signing process is in two stages.  In Stage one, a SHA-1 hash of
 the contents of each XBE section is made and the hash stored in a table
