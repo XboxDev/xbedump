@@ -26,6 +26,7 @@
 #include <openssl/err.h>
 #include <openssl/pkcs12.h>
 #include "openssl/e_os.h"
+#include <openssl/hmac.h>
 
 #include <openssl/crypto.h>
 #include <openssl/err.h>
@@ -336,6 +337,41 @@ void hmacx( unsigned char *result,
 	SHA1_Update(&sha_ctx,state2,0x40+0x14);
 	SHA1_Final(result, &sha_ctx);		
 }  
+
+
+void sub_VerifyCertificatex(unsigned char* src, unsigned char* dest)
+{
+	unsigned char *temp;
+	
+	// this is not the real Certificate Key, i left it out due Copyright problems
+	unsigned char Certficiatekey[]={ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
+	
+	//EVP_md5()
+	temp = HMAC(EVP_sha1(),&Certficiatekey[0], 16, src, 16,NULL,NULL);
+	memcpy(dest, temp, 16);
+}
+
+int VerifyCertificatex(void *xbe){
+	
+	XBE_HEADER *header;	 
+	XBE_CERTIFICATE *cert;
+	//unsigned char text[20];
+	
+	header = (XBE_HEADER*) xbe;
+	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
+	
+	sub_VerifyCertificatex(cert->LanKey,cert->LanKey);
+	sub_VerifyCertificatex(cert->SignatureKey,cert->SignatureKey);
+	for (int i = 0; i < 16; i++)
+	{
+		sub_VerifyCertificatex(&cert->AlternateSignatureKeys[i][0],&cert->AlternateSignatureKeys[i][0]);
+	}
+	//for (int a=0; a<20;a++) printf("%02X",text[a]);
+	return 0;
+
+}
+
 
 int read_rsafromflash(char *filename,unsigned int dumpflag)
 {

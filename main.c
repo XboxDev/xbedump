@@ -45,7 +45,8 @@ void usage(){
 	
 	"  ---- Special Options -----\n\n"
 	"   -sign        Special Option, Signes the xbe with the key who is stored in the xboxlib.c\n"
-	"                Leaves the XOR unchanged\n\n"
+	"                Leaves the XOR unchanged\n"
+	"   ?            Display Help\n\n"
 	
 	"  Note:         This code will work on little-endian 32-bit machines only! \n\n"
 	"                For working with this programm ,you need the original decompressed and decrypted Flash \n"
@@ -98,6 +99,10 @@ int main (int argc, const char * argv[])
 				
 		if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
  		if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
+ 		if (strcmp(argv[counter],"?")==0)  {
+ 				usage();
+ 				return 0;
+ 			}
 		
 		if (strcmp(argv[counter],"-sign")==0) { 
 				dumpflag=0;
