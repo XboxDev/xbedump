@@ -25,7 +25,6 @@
 #include <openssl/pem.h>
 #include <openssl/err.h>
 #include <openssl/pkcs12.h>
-#include "openssl/e_os.h"
 #include <openssl/hmac.h>
 
 #include <openssl/crypto.h>
