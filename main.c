@@ -99,6 +99,7 @@ int main (int argc, const char * argv[])
 				
 		if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
  		if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
+ 		if (strcmp(argv[counter],"-tl")==0)  dumpflag |= 0x00040000;
  		
  		if (strcmp(argv[counter],"-d1")==0)  dumpflag |= 0x01000000;
  		
@@ -123,7 +124,15 @@ int main (int argc, const char * argv[])
 		load_rsa(dumpflag);
 		
 		if (dumpflag & 0x00000FFF) dumpxbe(&filename[0],dumpflag);
-		if (dumpflag & 0x0fff0000) validatexbe(&filename[0],dumpflag);
+		if (dumpflag & 0x0fff0000) {
+						if (dumpflag & 0x00040000) {
+							quickvalidate(&filename[0],dumpflag);
+							return 0;
+							}
+						validatexbe(&filename[0],dumpflag);
+						
+					}
+						
 		// Verify the signed file
 		
 		if (verifyagain==1) { 

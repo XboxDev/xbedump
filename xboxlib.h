@@ -23,3 +23,4 @@ int dump_rsaxbe(char *filename);
 int read_rsafromflash(char *filename,unsigned int dumpflag); 
 int VerifyCertificatex(void *xbe);
 int load_rsa(unsigned int dumpflag);
+int quickvalidate(char *filename,unsigned int option_flag);
