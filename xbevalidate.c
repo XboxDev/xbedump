@@ -75,11 +75,12 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 
 	printf("Certificate Size  :    ");
 	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
-	if (cert->Size==0x1d0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
+	if (cert->Size>=0x1d0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 		
 	// Validates the Section Header Address 
 	printf("Section Address:       ");
-	eax +=0x1D0;
+	//eax +=0x1D0;
+	eax += cert->Size;
 	if (eax == (int)header->Sections) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 	
 
