@@ -13,7 +13,7 @@ all: clean xbe
 	${CXX} ${FLAGS} -o $@ -c $<
 
 xbe: ${THINGS} ${CRYPTOLIB}
-	gcc -o $@ -lm ${THINGS} 
+	${CXX} -o $@ -lm ${THINGS} 
 clean:
 	-rm -f *.o  xbe core
         
