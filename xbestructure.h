@@ -201,6 +201,6 @@ typedef struct _XBE_LIBRARY {
 #define XBE_SEC_RO_TAIL_PAGE            0x00000020
 
 void shax(unsigned char *result, unsigned char *data, unsigned int len);
-int validatexbe(char *filename,unsigned int option_flag);
-int dumpxbe (char *filename,unsigned int option_flag);
+int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag);
+int dumpxbe (void *xbe,unsigned int option_flag);
 

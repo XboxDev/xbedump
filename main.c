@@ -70,7 +70,10 @@ int main (int argc, const char * argv[])
 	unsigned int dumpflag=0;
 	char filename[512];
 	int verifyagain=0;
-	printf("XBE Dumper 0.3c\n");
+	unsigned int xbefile;
+	unsigned int filesize;
+	
+	printf("XBE Dumper 0.4-BETA Developer Release\n");
 
 //      dumpxbe("secret/xboxdash.xbe");
       //validatexbe("secret/xboxdash.xbe");
@@ -99,7 +102,7 @@ int main (int argc, const char * argv[])
 				
 		if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
  		if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
- 		if (strcmp(argv[counter],"-tl")==0)  dumpflag |= 0x00040000;
+ 		
  		
  		if (strcmp(argv[counter],"-d1")==0)  dumpflag |= 0x01000000;
  		
@@ -123,13 +126,13 @@ int main (int argc, const char * argv[])
 		//read_rsafromflash("flash.bin",dumpflag);
 		load_rsa(dumpflag);
 		
-		if (dumpflag & 0x00000FFF) dumpxbe(&filename[0],dumpflag);
+		if (dumpflag & 0x00000FFF) {
+						load_xbefile(xbefile,filesize,&filename[0]);
+						dumpxbe((void *)xbefile,dumpflag);
+					}
 		if (dumpflag & 0x0fff0000) {
-						if (dumpflag & 0x00040000) {
-							quickvalidate(&filename[0],dumpflag);
-							return 0;
-							}
-						validatexbe(&filename[0],dumpflag);
+						load_xbefile(xbefile,filesize,&filename[0]);						
+						validatexbe((void *)xbefile,filesize,dumpflag);
 						
 					}
 						
@@ -141,7 +144,10 @@ int main (int argc, const char * argv[])
 				dumpflag |= 0x10000000;  // Use Linux Test Keys
 				strcpy(&filename[0],"out.xbe");
 				printf("\n File out.xbe created, verifying it ...\n\n");
-				validatexbe(&filename[0],dumpflag);
+				free((void *)xbefile);
+				load_xbefile(xbefile,filesize,&filename[0]);
+				validatexbe((void *)xbefile,filesize,dumpflag);
+				
 			}
 		
 		

@@ -26,12 +26,12 @@
 #include "xboxlib.h"
 
 
-int validatexbe(char *filename,unsigned int option_flag){
+int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
     FILE *f;
-    int filesize;
+    
 //    int warn;
     int i;
-    void *xbe;
+    
     int fail=0;
         
     XBE_HEADER *header;
@@ -48,22 +48,7 @@ int validatexbe(char *filename,unsigned int option_flag){
     int eax;
     
     
-/* title */
 
-/* read file */
-    f = fopen(filename, "r");
-    if (f!=NULL) 
-    {    
-        fseek(f, 0, SEEK_END); filesize = ftell(f); fseek(f, 0, SEEK_SET);
-        xbe = malloc(filesize);
-       
-         
-        fread(xbe, 1, filesize, f);
-       
-         
-        fclose(f);
-       
-        printf("Validating file %s (%i bytes)\n", filename, filesize);
 
 	header = (XBE_HEADER*) xbe;
 	 
@@ -164,7 +149,7 @@ int validatexbe(char *filename,unsigned int option_flag){
 	
 
 	printf("\n");
-	
+	if (!(option_flag & 0x00020000))
 	if (fail==0) printf("\nXBE file integrity:    OK\n"); else  printf("\nXBE file integrity:    FALSE !!!!!!! FALSE !!!!!\n");
 	
 	if (option_flag & 0x00020000){
@@ -174,148 +159,11 @@ int validatexbe(char *filename,unsigned int option_flag){
          fclose(f);	
 		
 	}
-	free(xbe);
+
 	
 	
-    }
-	return 0;
-}
-
-
-
-int quickvalidate(char *filename,unsigned int option_flag){
-    FILE *f;
-    int filesize;
-//    int warn;
-    int i;
-    void *xbe;
-    int fail=0;
-        
-    XBE_HEADER *header;
-    XBE_CERTIFICATE *cert;
-    XBE_SECTION *sechdr;
-    XBE_TLS *tls;
-  //  XBE_LIBRARY *lib;
-//    unsigned char sha1hashout[20];
-//    unsigned char md5hashout[16];
-
-//    unsigned int EntryPoint;
-//    unsigned int KernelThunkTable;
-    unsigned char sha_Message_Digest[20];
-    int eax;
-    i=option_flag;
-    i=0;
     
-/* title */
-
-/* read file */
-    f = fopen(filename, "r");
-    if (f!=NULL) 
-    {    
-        fseek(f, 0, SEEK_END); filesize = ftell(f); fseek(f, 0, SEEK_SET);
-        xbe = malloc(filesize);
-       
-         
-        fread(xbe, 1, filesize, f);
-       
-         
-        fclose(f);
-       
-//        printf("Validating file %s (%i bytes)\n", filename, filesize);
-
-	header = (XBE_HEADER*) xbe;
-	 
-       	 // If the magic value XBEH is not present, error
-//	printf("Magic XBEH value:      ");
-//	if (memcmp(header->Magic, "XBEH", 4)==0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-	
-	// If the header has the correct size, error ???  
-//	printf("Header Size:           ");
-//	if (header->XbeHeaderSize == 0x178) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-		
-	// If the image base is not 00010000,
-//	printf("Image Base Address:    ");
-//	if (((int)header->BaseAddress)== 0x10000)  { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-	
-	//eax = header->HeaderSize;
-	eax = header->XbeHeaderSize;
-	eax += 0x10000;
-	
-	// Validates the Certificate Entry Address 
-//	printf("Certificate Adress:    ");
-//	if (eax == (int)header->Certificate) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-
-//	printf("Certificate Size  :    ");
-	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
-//	if (cert->Size==0x1d0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-		
-	// Validates the Section Header Address 
-//	printf("Section Address:       ");
-	eax +=0x1D0;
-//	if (eax == (int)header->Sections) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-	
-
-	// Check, that Debug Address is not set
-//	printf("Debug Address:         ");
-//	if ((int)header->DebugImportTable== 0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-
-	// XOR Entry Address
-	//header->EntryPoint = (void *)((int) header->EntryPoint ^0xA8FC57AB); 
-	// XOR Kernel Image thunk Address
-	//header->KernelThunkTable = (unsigned int *)((int) header->KernelThunkTable ^ 0x5B6D40B6);
-	
-//	printf("Kernel Entry:          %08X\n",(int)header->EntryPoint^0xA8FC57AB);
-//	printf("Kernel Thunk Table:    %08X\n",(int)header->KernelThunkTable^ 0x5B6D40B6);
-	// Check the Hash of the Sections
-        
-        tls = (XBE_TLS *)(((char *)xbe) + (int)header->TlsDirectory - (int)header->BaseAddress);
-        
-   //     tls->RawStart=0xFFFFFF;
-        
-        
-         sechdr = (XBE_SECTION *)(((char *)xbe) + (int)header->Sections - (int)header->BaseAddress);
-    	 
-         for (i = 0; i < header->NumSections; i++, sechdr++) 
-         {
-	  	shax(&sha_Message_Digest[0], ((unsigned char *)xbe)+(int)sechdr->FileAddress ,sechdr->FileSize);
-	  	
-	  //	printf("Section: %2d Hash:      ",i);
-	  	
-	  	
-	  	if (memcmp(&sha_Message_Digest[0],&sechdr->ShaHash[0],20)==0) 
-	  	{
-	  		// printf("pass"); 
-		} else {       
-			fail=1; 
-		//	printf("fail"); 
-		}
-	
-		//printf("\n"); 
-	 }	
-	
-	
-	    
-	    
-//	printf("2048 RSA Signature:    ");
-	if (VerifySignaturex(xbe,0)== 1) { 
-//		printf("pass"); 
-		// Debug Message D1
-
-	} else { 
-		fail=1; 
-//		printf("fail"); 
-			
-		
-	}                   
-	
-
-	printf("\n");
-	
-	if (fail==0) printf("XBE file integrity:    OK\n"); else  printf("XBE file integrity:    FALSE !!!!!!! FALSE !!!!!\n");
-	printf("\n");	
-	free(xbe);
-	
-	
-    }
 	return 0;
 }
+
+
