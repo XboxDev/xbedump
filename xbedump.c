@@ -24,12 +24,6 @@
 #include <time.h>
 
 
-
-
-#include <openssl/crypto.h>
-#include <openssl/err.h>
-#include <openssl/bn.h>
-
 #include "xbestructure.h"
 #include "xboxlib.h"
 
@@ -38,6 +32,33 @@ void printdate(unsigned int t_time) {
     
     time_t rawtime=t_time;
     printf("%s",ctime(&rawtime)); 
+}
+
+void printhex_strip(unsigned char d) {
+    if (d<16) printf("0");
+    printf("%x", d);
+}
+
+void printhexm_strip(unsigned char *d, int size) {
+    int i;
+    for (i = 0; i < size; i++, d++) {
+        if (!(i & 15) && i != 0) printf("\n");
+        printhex_strip(*d);
+    }
+    printf("\n");
+}
+
+void printhex_cert(unsigned char *d, int size) {
+    int i;
+    int line = 0;
+    for (i = 0; i < size; i++, d++) {
+        if (!(i & 15)) {
+		line ++;
+		printf("\n	KEY_ALT%d=",line);
+	}
+        printhex_strip(*d);
+    }
+    printf("\n");
 }
 
 void printhex(unsigned char d) {
@@ -164,6 +185,21 @@ int dumpxbe (void *xbe,unsigned int option_flag){
      /* header */
          header = (XBE_HEADER*) xbe;
 
+if (option_flag == 0x0000000A) {
+	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
+	printf("#\n# "); printunicode(cert->TitleName); printf("\n#\n");
+        printf("[Game-%08X]\n\n",cert->TitleId);
+	printf("	NAME=");printunicode(cert->TitleName); printf("\n\n");
+	printf("	ID=%08X\n",cert->TitleId); printf("\n");
+	printf("	HASH_METHOD=HM_UNKNOWN\n\n");
+	printf("	WHICH_KEY=KEY_SIG\n\n");
+	printf("	KEY_SIG="); printhexm_strip(cert->SignatureKey, sizeof(cert->SignatureKey));
+	printf("	KEY_LAN="); printhexm_strip(cert->LanKey, sizeof(cert->LanKey));
+	printhex_cert((unsigned char*)cert->AlternateSignatureKeys, sizeof(cert->AlternateSignatureKeys));
+	printf("\n");
+	return 0;
+}
+				   
 if (option_flag & 0x00000001) {
 
          printf("\nXBE header\n~~~~~~~~~~\n");

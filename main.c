@@ -48,18 +48,12 @@ void usage(){
 	"  ---- Special Options -----\n\n"
 	"   -sign        Special Option, Signes the xbe with the key who is stored in the xboxlib.c\n"
 	"                patches the XOR Keys\n"
+	"   -xbgs        Dumps xbgs output\n"
 	"   ?            Display Help\n\n"
 	
 	"  Note:         This code will work on little-endian 32-bit machines only! \n\n"
 	
-	"  Credits to \n"
-	"      Andy Green andy@warmcat.com \n"
-	"      Michael Steil mist@c64.org for writing the excellent original xbedumper\n"
-	"      Asterix\n"
-	"      All other freaks who helped\n\n"
-
-	
-	"  (C)2002,2003 by Franz Lehner franz@caos.at (hamtitampti)\n");
+	"  (C)2002,2003 by XBL Team (hamtitampti) \n");
 	
 	
 }
@@ -73,8 +67,6 @@ int main (int argc, const char * argv[])
 	unsigned int xbefile;
 	unsigned int filesize;
 	
-	printf("XBE Dumper 0.4-BETA Developer Release\n");
-
 //      dumpxbe("secret/xboxdash.xbe");
       //validatexbe("secret/xboxdash.xbe");
 	if (argc == 2) {
@@ -102,6 +94,7 @@ int main (int argc, const char * argv[])
 				
 		if (strcmp(argv[counter],"-vh")==0)  dumpflag |= 0x00010000;
  		if (strcmp(argv[counter],"-wb")==0)  dumpflag |= 0x00020000;
+ 	  	if (strcmp(argv[counter],"-xbgs")==0) dumpflag |= 0x0000000A;
  		
  		
  		if (strcmp(argv[counter],"-d1")==0)  dumpflag |= 0x01000000;
@@ -122,6 +115,10 @@ int main (int argc, const char * argv[])
 				verifyagain=1;
 			}
 			
+		}
+
+		if(dumpflag != 0x0000000A) {
+			printf("XBE Dumper 0.4-BETA Developer Release\n");
 		}
 
 		//read_rsafromflash("flash.bin",dumpflag);

@@ -22,20 +22,15 @@
 #include <string.h>
 #include "xboxlib.h"
 #include "xbestructure.h"
-#include <openssl/sha.h>
-#include <openssl/pem.h>
-#include <openssl/err.h>
+   
 
-#include <openssl/hmac.h>
+#include "giants.h"
+#include "sha1.h"
 
-#include <openssl/crypto.h>
-#include <openssl/err.h>
-#include <openssl/bn.h>
-
-int __gxx_personality_v0=0;  
 
 // prototype
 
+#if 0
 // Test Keys
 unsigned char Testkey[] = {
  	0x52,0x53,0x41,0x31, 0x08,0x01,0x00,0x00, 0x00,0x08,0x00,0x00, 0xff,0x00,0x00,0x00,
@@ -76,6 +71,52 @@ unsigned char Testkey[] = {
 	0x29,0x1C,0xDA,0x27,0x20,0xC9,0x6F,0x11,0xEE,0x1B,0xEB,0xFB,0x00,0x6A,0xDA,0x72
  	
 };
+
+#else
+
+// Test keys with Exponent = 1
+unsigned char Testkey[] = {
+ 	0x52,0x53,0x41,0x31, 0x08,0x01,0x00,0x00, 0x00,0x08,0x00,0x00, 0xff,0x00,0x00,0x00,
+ 	0x01,0x00,0x00,0x00, 
+ 	// Public Modulus "m"
+ 	0xd3,0xd7,0x4e,0xe5, 0x66,0x3d,0xd7,0xe6, 0xc2,0xd4,0xa3,0xa1, 0xf2,0x17,0x36,0xd4, 
+ 	0x2e,0x52,0xf6,0xd2, 0x02,0x10,0xf5,0x64, 0x9c,0x34,0x7b,0xff, 0xef,0x7f,0xc2,0xee,
+ 	0xbd,0x05,0x8b,0xde, 0x79,0xb4,0x77,0x8e, 0x5b,0x8c,0x14,0x99, 0xe3,0xae,0xc6,0x73,
+ 	0x72,0x73,0xb5,0xfb, 0x01,0x5b,0x58,0x46, 0x6d,0xfc,0x8a,0xd6, 0x95,0xda,0xed,0x1b,
+ 	0x2e,0x2f,0xa2,0x29, 0xe1,0x3f,0xf1,0xb9, 0x5b,0x64,0x51,0x2e, 0xa2,0xc0,0xf7,0xba, 
+ 	0xb3,0x3e,0x8a,0x75, 0xff,0x06,0x92,0x5c, 0x07,0x26,0x75,0x79, 0x10,0x5d,0x47,0xbe, 
+ 	0xd1,0x6a,0x52,0x90, 0x0b,0xae,0x6a,0x0b, 0x33,0x44,0x93,0x5e, 0xf9,0x9d,0xfb,0x15, 
+ 	0xd9,0xa4,0x1c,0xcf, 0x6f,0xe4,0x71,0x94, 0xbe,0x13,0x00,0xa8, 0x52,0xca,0x07,0xbd, 
+ 	0x27,0x98,0x01,0xa1, 0x9e,0x4f,0xa3,0xed, 0x9f,0xa0,0xaa,0x73, 0xc4,0x71,0xf3,0xe9, 
+ 	0x4e,0x72,0x42,0x9c, 0xf0,0x39,0xce,0xbe, 0x03,0x76,0xfa,0x2b, 0x89,0x14,0x9a,0x81, 
+ 	0x16,0xc1,0x80,0x8c, 0x3e,0x6b,0xaa,0x05, 0xec,0x67,0x5a,0xcf, 0xa5,0x70,0xbd,0x60, 
+ 	0x0c,0xe8,0x37,0x9d, 0xeb,0xf4,0x52,0xea, 0x4e,0x60,0x9f,0xe4, 0x69,0xcf,0x52,0xdb, 
+ 	0x68,0xf5,0x11,0xcb, 0x57,0x8f,0x9d,0xa1, 0x38,0x0a,0x0c,0x47, 0x1b,0xb4,0x6c,0x5a, 
+ 	0x53,0x6e,0x26,0x98, 0xf1,0x88,0xae,0x7c, 0x96,0xbc,0xf6,0xbf, 0xb0,0x47,0x9a,0x8d, 
+ 	0xe4,0xb3,0xe2,0x98, 0x85,0x61,0xb1,0xca, 0x5f,0xf7,0x98,0x51, 0x2d,0x83,0x81,0x76, 
+ 	0x0c,0x88,0xba,0xd4, 0xc2,0xd5,0x3c,0x14, 0xc7,0x72,0xda,0x7e, 0xbd,0x1b,0x4b,0xa4,  
+	// Private Key "d"
+
+
+	0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,			
+	
+};
+#endif
                   
 unsigned char xboxPublicKeyData[] = {
  	0x52,0x53,0x41,0x31, 0x08,0x01,0x00,0x00, 0x00,0x08,0x00,0x00, 0xff,0x00,0x00,0x00,
@@ -187,85 +228,64 @@ int read_rsafrombin_asterix()
 	return 0;
 }     
 
+void gigimport(giant g, unsigned char *buff,int len){
+
+	int count;
+	memcpy(g->n,buff,len);
+	g->sign = len/2;
+	// Correcting to bits now
+	for (count = (len-1);count!=0;count--) {
+		if (buff[count] != 0x00) {
+			count = count+1;
+			break;      
+		}
+	}                                      
+
+	if ((count%2) == 1) count = count +1;
+	g->sign= count/2;
+
+}
 
 // DE - Crypting
-int decrypt_signature(unsigned char *c_number,unsigned char *cryptbuffer){
-  
-    BN_CTX *ctx;
-    BIO *out;
-    BIGNUM *rsa_signature,*rsa_exp,*rsa_mod,*rsa_out; //*rsa_hash;
-    int count;
+int decrypt_signature(unsigned char *c_number,unsigned char *cryptbuffer) {
+	
+	giant n = newgiant(INFINITY);	
+	giant e = newgiant(INFINITY);	
+	giant sig = newgiant(INFINITY);	
+	
+ 	int count;
+        gigimport(sig,c_number,256);
 
-    unsigned char c_modulo[256];
-    unsigned char d_modulo[256];
-    unsigned char c_exponent[4];
-    unsigned char d_exponent[4];
-    unsigned char d_number[256];
-    
-    memcpy(&c_modulo,xePublicKeyData.Modulus,256);
-    memcpy(&c_exponent,xePublicKeyData.Exponent,4);
-    
-    // convert from Intel Big Endian Format
-    for (count=0;count<256;count++) d_modulo[count]=c_modulo[255-count];
-    for (count=0;count<256;count++) d_number[count]=c_number[255-count];
-    for (count=0;count<4;count++) d_exponent[count]=c_exponent[3-count];
-    
-    
-    ctx=BN_CTX_new();
-    rsa_signature=BN_new();
-    rsa_exp=BN_new();
-    rsa_mod=BN_new();
-    rsa_out=BN_new();
-            
-    out=BIO_new(BIO_s_file());
-    BIO_set_fp(out,stdout,BIO_NOCLOSE);
-    
-    rsa_signature=BN_bin2bn(d_number,256,rsa_signature); 
-    rsa_exp=BN_bin2bn(d_exponent,4,rsa_exp); 
-    rsa_mod=BN_bin2bn(d_modulo,256,rsa_mod); 
+	gigimport(n,xePublicKeyData.Modulus,256);
 
-    
-    BN_mod_exp(rsa_out,rsa_signature,rsa_exp,rsa_mod,ctx);
-  
-/*    
-    printf("\n");
-    printf("Crypted:\n");
-    BN_print(out,rsa_signature);printf("\n"); 
-    printf("Exponent:\n");
-    BN_print(out,rsa_exp);printf("\n"); 
-    printf("Modulus:\n");
-    BN_print(out,rsa_mod);printf("\n");
-    printf("\n");
-    printf("Result:\n");
-    BN_print(out,rsa_out);printf("\n"); 
-  */  
-    
-    // as the first 00 are striped off, attach again to the string
+	gigimport(e,xePublicKeyData.Exponent,4);
 
-    for (count=0;count<256;count++) cryptbuffer[count]=0x00;
-    int len=BN_bn2bin(rsa_out, d_number);
-    //for (count=0;count<len;count++) cryptbuffer[256-len+count]=d_number[count]; 
-    
-    // Reverse it to "pseudo Big-Endian" Format
-    for (count=0;count<len;count++) cryptbuffer[255+(len-256)-count]=d_number[count]; 
- /*
-    printf("\ntest\n");
-    for (count=0;count<256;count++) printf("%02X",  cryptbuffer[count]);
-    printf("\ntest-end\n");
- */
-    return 1;
+
+	/* x := x^n (mod z). */
+	powermodg(sig,e, n);	
+
+	//gout(n);
+	//gout(e);
+	//gout(sig);
+
+	memset(cryptbuffer,0x00,256);
+	memcpy(cryptbuffer,sig->n,256);
+	//for (count=0; count < 256;count++) printf("%02X",cryptbuffer[count]);
+	
+	 return 1;
 }
+
 // END DE-Crypting
 
 
 int Verifyhash(unsigned char *hash,unsigned char *decryptBuffer,int debugout){
 
-  unsigned char cmphash[20];
-  int a;
-  int zero_position = 20; 
+  	unsigned char cmphash[20];
+  	int a;
+  	int zero_position = 20; 
   
-  // Convert Hash to "Big-Endian Format"
-  for (a=0;a<20;a++) cmphash[a] = hash[19-a];
+  	// Convert Hash to "Big-Endian Format"
+  	for (a=0;a<20;a++) cmphash[a] = hash[19-a];
   
   if (debugout!=0) {
 	
@@ -295,129 +315,91 @@ int Verifyhash(unsigned char *hash,unsigned char *decryptBuffer,int debugout){
         
   }
 
-  // Compare if the Hash Results (first 20 Bytes) are the same
-  if (memcmp(decryptBuffer, cmphash, 20)!=0)   return 0;
+  	// Compare if the Hash Results (first 20 Bytes) are the same
+  	if (memcmp(decryptBuffer, cmphash, 20)!=0)   return 0;
 
-  unsigned char *pkcspad;
-  for (int tableIndex = 0; RSApkcs1paddingtable[tableIndex][0] !=0; tableIndex++) {
+  	unsigned char *pkcspad;
+  	for (int tableIndex = 0; RSApkcs1paddingtable[tableIndex][0] !=0; tableIndex++) {
   	
-  	pkcspad=(unsigned char*)RSApkcs1paddingtable[tableIndex];
-  	int difference = memcmp(pkcspad+1,&decryptBuffer[20],*pkcspad); 
+  		pkcspad=(unsigned char*)RSApkcs1paddingtable[tableIndex];
+  		int difference = memcmp(pkcspad+1,&decryptBuffer[20],*pkcspad); 
   	
-  	if (!difference)
-	{
-		zero_position = *pkcspad + 20;
-		break;
+  		if (!difference)
+		{
+			zero_position = *pkcspad + 20;
+			break;
+		}
+  
 	}
-  
-  }
 	  
-  // Padding checking , xbox does exactly the same 
+  	// Padding checking , xbox does exactly the same 
   
-  if (decryptBuffer[zero_position]!= 0x00) 
-  	return 0;
+  	if (decryptBuffer[zero_position]!= 0x00) return 0;
   	
-  if (decryptBuffer[xePublicKeyData.ModulusSize]!= 0x00) 
-  	return 0;
+  	if (decryptBuffer[xePublicKeyData.ModulusSize]!= 0x00) return 0;
   
-  if (decryptBuffer[xePublicKeyData.ModulusSize-1]!= 0x01) 
-  	return 0;
+  	if (decryptBuffer[xePublicKeyData.ModulusSize-1]!= 0x01) return 0;
   
-  for (unsigned int i = zero_position+1; i < (xePublicKeyData.ModulusSize-1); i++) {
-	if (decryptBuffer[i] != 0xff) return 0;
-	//printf("%02X",decryptBuffer[i])  ;
-  }  
+  	for (unsigned int i = zero_position+1; i < (xePublicKeyData.ModulusSize-1); i++) {
+		if (decryptBuffer[i] != 0xff) return 0;
+		//printf("%02X",decryptBuffer[i])  ;
+  	}  
 
 
-  return 1;
+  	return 1;
   
 }
 
 
 int crypt_signature(unsigned char *c_number,unsigned char *cryptbuffer){
   
-    BN_CTX *ctx;
-    BIO *out;
-    BIGNUM *rsa_signature,*rsa_pri,*rsa_mod,*rsa_out; //*rsa_hash;
-    int count;
+    	int count;
+    	unsigned char c_signature[256];
+    	unsigned char c_hash[20];
+    	unsigned int a;
 
-    unsigned char c_modulo[256];
-    unsigned char d_modulo[256];
-    unsigned char c_private[256];
-    unsigned char d_private[256];
-    unsigned char d_number[256];
-    unsigned char c_signature[256];
-    unsigned char c_hash[20];
-    unsigned int a;
+	giant n = newgiant(INFINITY);	
+	giant e = newgiant(INFINITY);	
+	giant sig = newgiant(INFINITY);	
+	
+	gigimport(n,xePublicKeyData.Modulus,256);
+
+	
+	gigimport(e,xePublicKeyData.Privatekey,256);
+
+	
+    	for (count=0;count<20;count++) c_hash[count]=c_number[19-count];
+    
+    	int zero_position=20;
+    	// Message Padding 
+    	c_signature[xePublicKeyData.ModulusSize]=0x00;
+    	c_signature[xePublicKeyData.ModulusSize-1]=0x01;
+    	memcpy(&c_signature[0],&c_hash[0],20);
+ 
+    	int padmethod=2;        
+    	memcpy(&c_signature[20],&RSApkcs1paddingtable[padmethod][1],RSApkcs1paddingtable[padmethod][0]);
+    	zero_position += RSApkcs1paddingtable[padmethod][0];
+
+    	c_signature[zero_position]=0x00;   
+    	for (a=zero_position+1;a<(xePublicKeyData.ModulusSize-1);a++) c_signature[a]=0xFF;
+ 
+   //     for (count=0;count<256/2;count++) printf("%04x",n->n[count]);
         
-    memcpy(&c_modulo,xePublicKeyData.Modulus,256);
-    memcpy(&c_private,xePublicKeyData.Privatekey,256);
-    
-    // Reverse Public Modulus
-    for (count=0;count<256;count++) d_modulo[count]=c_modulo[255-count];
-    // Reverse Private Key
-    for (count=0;count<256;count++) d_private[count]=c_private[255-count];
-    // Reverse Hash
-    for (count=0;count<20;count++) c_hash[count]=c_number[19-count];
-    
-    int zero_position=20;
-    // Message Padding 
-    c_signature[xePublicKeyData.ModulusSize]=0x00;
-    c_signature[xePublicKeyData.ModulusSize-1]=0x01;
-    memcpy(&c_signature[0],&c_hash[0],20);
- 
-    int padmethod=2;        
-    memcpy(&c_signature[20],&RSApkcs1paddingtable[padmethod][1],RSApkcs1paddingtable[padmethod][0]);
-    zero_position += RSApkcs1paddingtable[padmethod][0];
 
-    c_signature[zero_position]=0x00;   
-    for (a=zero_position+1;a<(xePublicKeyData.ModulusSize-1);a++) c_signature[a]=0xFF;
- 
- 
+        gigimport(sig,c_signature,256);
 
-    // Reverse Signature for Crypting again
-    for (count=0;count<256;count++) d_number[count]=c_signature[255-count];
-    
-  //  for (a=0;a<256;a++) printf("%02X",d_number[a]);  
-    
-    
-    ctx=BN_CTX_new();
-    rsa_signature=BN_new();
-    rsa_pri=BN_new();
-    rsa_mod=BN_new();
-    rsa_out=BN_new();
-            
-    out=BIO_new(BIO_s_file());
-    BIO_set_fp(out,stdout,BIO_NOCLOSE);
-    
-    rsa_signature=BN_bin2bn(d_number,256,rsa_signature); 
-    rsa_pri=BN_bin2bn(d_private,256,rsa_pri); 
-    rsa_mod=BN_bin2bn(d_modulo,256,rsa_mod); 
- 
-    BN_mod_exp(rsa_out,rsa_signature,rsa_pri,rsa_mod,ctx);
-  
-    /*
-    printf("crypting\n");
-    
-    printf("Crypted:\n");
-    BN_print(out,rsa_signature);printf("\n"); 
-    printf("Exponent:\n");
-    BN_print(out,rsa_pri);printf("\n"); 
-    printf("Modulus:\n");
-    BN_print(out,rsa_mod);printf("\n");
-    printf("\n");
-    printf("Result:\n");
-    BN_print(out,rsa_out);printf("\n"); 
-    */
-    
-    // as the first 00 are striped off, attach again to the string
+//	gout(n);
+//	gout(e);
+//	gout(sig);   	
 
-    for (count=0;count<256;count++) cryptbuffer[count]=0x00;
-    int len=BN_bn2bin(rsa_out, d_number);
+
+	/* x := x^n (mod z). */
+	powermodg(sig,e, n);	
+	
+	memset(cryptbuffer,0x00,256);
+	memcpy(cryptbuffer,sig->n,256);
     
-    for (count=0;count<len;count++) cryptbuffer[count]=d_number[255-count]; 
-     
-    return 1;
+    	return 1;
 }
 
 
@@ -459,47 +441,16 @@ int VerifySignaturex(void *xbe,int debugout) {
 
 void shax(unsigned char *result, unsigned char *data, unsigned int len)
 {
-	SHA_CTX	sha_ctx;
-	SHA1_Init(&sha_ctx);
-	SHA1_Update(&sha_ctx, (unsigned char *)&len, 4);
-	SHA1_Update(&sha_ctx, data, len);
-	SHA1_Final(result, &sha_ctx);	
-	
+	struct SHA1Context context;
+   	
+   	SHA1Reset(&context);
+	SHA1Input(&context, (unsigned char *)&len, 4);
+	SHA1Input(&context,data,len);
+	SHA1Result(&context,result);	
 }
 
 
-void sub_VerifyCertificatex(unsigned char* src, unsigned char* dest)
-{
-	unsigned char *temp;
-	
-	// this is not the real Certificate Key, i left it out due Copyright problems
-	unsigned char Certficiatekey[]={ 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-	
-	//EVP_md5()
-	temp = HMAC(EVP_sha1(),&Certficiatekey[0], 16, src, 16,NULL,NULL);
-	memcpy(dest, temp, 16);
-}
-
-int VerifyCertificatex(void *xbe){
-	
-	XBE_HEADER *header;	 
-	XBE_CERTIFICATE *cert;
-	//unsigned char text[20];
-	
-	header = (XBE_HEADER*) xbe;
-	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
-	
-	sub_VerifyCertificatex(cert->LanKey,cert->LanKey);
-	sub_VerifyCertificatex(cert->SignatureKey,cert->SignatureKey);
-	for (int i = 0; i < 16; i++)
-	{
-		sub_VerifyCertificatex(&cert->AlternateSignatureKeys[i][0],&cert->AlternateSignatureKeys[i][0]);
-	}
-	//for (int a=0; a<20;a++) printf("%02X",text[a]);
-	return 0;
-
-}
 
 int load_rsa(unsigned int dumpflag)
 {
@@ -633,7 +584,7 @@ int load_xbefile(unsigned int &xbe,unsigned int &filesize,char *filename) {
          fseek(f, 0, SEEK_END); 
          filesize = ftell(f); 
          fseek(f, 0, SEEK_SET);
-         printf("Loading file %s (%i bytes)\n", filename, filesize);
+//         printf("Loading file %s (%i bytes)\n", filename, filesize);
          
          file = malloc(filesize);
          xbe=(unsigned int)file;
