@@ -33,6 +33,7 @@
 #include <openssl/bn.h>
 
 #include "xbestructure.h"
+#include "xboxlib.h"
 
 
 void printdate(unsigned int t_time) {
@@ -258,6 +259,8 @@ if (option_flag & 0x00000002) {
          printf("Signature key: "); printhexm(cert->SignatureKey, sizeof(cert->SignatureKey));
          printf("Alternate signature keys: "); printhexm((unsigned char*)cert->AlternateSignatureKeys, sizeof(cert->AlternateSignatureKeys));
 
+	// VerifySignaturex(xbe,1);
+	
 /*	 shax(&sha_Message_Digest[0], ((unsigned char *)xbe)+0x104 ,header->HeaderSize - 0x104);
          printf("\nHeader hash: calculated \n\t");
          for (a=0;a<20;a++) printf("%02X",sha_Message_Digest[a]);

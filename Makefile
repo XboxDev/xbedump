@@ -1,17 +1,17 @@
-CXX       = gcc
+CXX       = g++
 OPT       = -O -g
-FLAGS     = $(OPT) -W -Wall -L. -I /usr/local/ssl/include
+FLAGS     = $(OPT) -ansi -W -Wall -L. -I /usr/local/ssl/include
 CRYPTOLIB  = /usr/local/ssl/lib/libcrypto.a
 
-THINGS =  xboxlib.o xbedump.o xbevalidate.o main.o
+THINGS =  xboxlib.o xbedump.o  xbevalidate.o main.o
 
-all: xbedump
+all: xbe
 
 %.o	: %.c
 	${CXX} ${FLAGS} -o $@ -c $<
 
-xbedump: ${THINGS} ${CRYPTOLIB}
+xbe: ${THINGS} ${CRYPTOLIB}
 	gcc -o $@ ${THINGS} ${CRYPTOLIB}
 clean:
-	-rm -f *.o  xbedump *~
+	-rm -f *.o  xbe core
 

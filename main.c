@@ -24,10 +24,10 @@
 
 
 void usage(){
-
-	printf("(C)2002 Franz Lehner franz@caos.at\n(C)2002 Michael Steil mist@c64.org\n\n");
-
-	printf("  Usage:    xbedump [xbefile] [options]\n\n");
+	
+	printf("(C)2002 Franz Lehner franz@caos.at\n(C)2002 Michael Steil mist@c64.org\n\n");	
+	 
+	printf("  Usage:    xbe [xbefile] [options]\n\n");
 	       
 	printf("   -da          Dumps the compleate XBE Header Structure\n");
 	printf("   -dh          Dumps the Header info\n");
@@ -37,7 +37,7 @@ void usage(){
 	       
 	printf("   -vh          Verifies the Section Hash\n");
 	printf("   -wb          Writes back the update to file out.xbe \n\n");
-	
+	printf("\n  For checking the RSA 2048 bit Signature,\n  you need the original decompressed Flash stored in flash.bin in the same directory \n");
 	printf("\n  Note: this code will work on little-endian 32-bit machines only! \n  Take an old Pentium\n\n");
 	
 	
@@ -49,7 +49,7 @@ int main (int argc, const char * argv[])
 	unsigned int dumpflag=0;
 	char filename[512];
 
-	printf("XBE Dumper 0.2b  (C)2002 Franz Lehner franz@caos.at\n                 based on XBE validator by Michael Steil\n\n");
+	printf("XBE Dumper 0.3b  (C)2002 Franz Lehner franz@caos.at\n                 based on XBE validator by Michael Steil\n\n");
 
 //      dumpxbe("secret/xboxdash.xbe");
       //validatexbe("secret/xboxdash.xbe");

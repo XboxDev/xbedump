@@ -23,6 +23,7 @@
 
 
 #include "xbestructure.h"
+#include "xboxlib.h"
 
 
 int validatexbe(char *filename,unsigned int option_flag){
@@ -31,11 +32,10 @@ int validatexbe(char *filename,unsigned int option_flag){
 //    int warn;
     int i;
     void *xbe;
-    void *correct_xbe;
     
     XBE_HEADER *header;
     XBE_CERTIFICATE *cert;
-    XBE_SECTION *sechdr,*corr_secdr;
+    XBE_SECTION *sechdr;
  //   XBE_TLS *tls;
  //   XBE_LIBRARY *lib;
 //    unsigned char sha1hashout[20];
@@ -55,10 +55,10 @@ int validatexbe(char *filename,unsigned int option_flag){
     {    
         fseek(f, 0, SEEK_END); filesize = ftell(f); fseek(f, 0, SEEK_SET);
         xbe = malloc(filesize);
-        correct_xbe = malloc(filesize);
+       
          
         fread(xbe, 1, filesize, f);
-        memcpy(correct_xbe, xbe, filesize);
+       
          
         fclose(f);
        
@@ -101,27 +101,25 @@ int validatexbe(char *filename,unsigned int option_flag){
 	if ((int)header->DebugImportTable== 0) { printf("pass\n"); } else { printf("fail\n"); }
 
 	// XOR Entry Address
-	header->EntryPoint = (void *)((int) header->EntryPoint ^0xA8FC57AB); 
+	//header->EntryPoint = (void *)((int) header->EntryPoint ^0xA8FC57AB); 
 	// XOR Kernel Image thunk Address
-	header->KernelThunkTable = (unsigned int *)((int) header->KernelThunkTable ^ 0x5B6D40B6);
-	printf("Kernel Entry:          %08X\n",(int)header->EntryPoint);
-	printf("Kernel Thunk Table:    %08X\n",(int)header->KernelThunkTable);
+	//header->KernelThunkTable = (unsigned int *)((int) header->KernelThunkTable ^ 0x5B6D40B6);
+	
+	printf("Kernel Entry:          %08X\n",(int)header->EntryPoint^0xA8FC57AB);
+	printf("Kernel Thunk Table:    %08X\n",(int)header->KernelThunkTable^ 0x5B6D40B6);
 	// Check the Hash of the Sections
          sechdr = (XBE_SECTION *)(((char *)xbe) + (int)header->Sections - (int)header->BaseAddress);
     	 
-    	 corr_secdr = (XBE_SECTION *)(((char *)correct_xbe) + (int)header->Sections - (int)header->BaseAddress);
-    	 
          for (i = 0; i < header->NumSections; i++, sechdr++) {
 	  	shax(&sha_Message_Digest[0], ((unsigned char *)xbe)+(int)sechdr->FileAddress ,sechdr->FileSize);
-		
 	  	
 	  	printf("Section: %2d Hash:      ",i);
 	  	
 	  	if (memcmp(&sha_Message_Digest[0],&sechdr->ShaHash[0],20)==0) { printf("pass\n"); 
 		} else { 
-		printf("fail\n"); 
+		printf("fail"); 
 		if (option_flag & 0x00020000) {
-			memcpy(&corr_secdr->ShaHash[0],&sha_Message_Digest[0],20);
+			memcpy(&sechdr->ShaHash[0],&sha_Message_Digest[0],20);
 			printf(" -> corrected"); 
 		}
 		printf("\n"); 
@@ -129,15 +127,23 @@ int validatexbe(char *filename,unsigned int option_flag){
 	
 	 }	
 	
+	printf("2048 RSA Signature:    ");
+	if (VerifySignaturex(xbe,0)== 1) { 
+		printf("pass\n"); 
+	} else { 
+		printf("fail\n"); 
+		VerifySignaturex(xbe,1);
+	}
+	
 	if (option_flag & 0x00020000){
 	 f = fopen("out.xbe", "w");
-	 fwrite(correct_xbe, 1, filesize, f);
+	 fwrite(xbe, 1, filesize, f);
          
          fclose(f);	
 		
 	}
 	free(xbe);
-	free(correct_xbe);
+	
 	
     }
 	return 0;
