@@ -33,6 +33,7 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
     int i;
     
     int fail=0;
+    unsigned int xorkey;
         
     XBE_HEADER *header;
     XBE_CERTIFICATE *cert;
@@ -90,10 +91,23 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 	//header->EntryPoint = (void *)((int) header->EntryPoint ^0xA8FC57AB); 
 	// XOR Kernel Image thunk Address
 	//header->KernelThunkTable = (unsigned int *)((int) header->KernelThunkTable ^ 0x5B6D40B6);
+
+	if (option_flag & 0x00100000) {
+		// Patch XOR keys   
+		printf("Patch XOR Keys\n");
+		header->EntryPoint ^= xorentry(1);
+		header->KernelThunkTable ^= xorthunk(1);
+
+	}
+	xorkey=xorentry(0);
+	printf("Kernel Entry:          %08X  (KEY: %08X)\n",(int)header->EntryPoint^xorkey,xorkey);
+	xorkey=xorthunk(0);
+	printf("Kernel Thunk Table:    %08X  (KEY: %08X)\n",(int)header->KernelThunkTable^xorkey,xorkey);
+	// Check the Hash of the Sections                      
 	
-	printf("Kernel Entry:          %08X\n",(int)header->EntryPoint^0xA8FC57AB);
-	printf("Kernel Thunk Table:    %08X\n",(int)header->KernelThunkTable^ 0x5B6D40B6);
-	// Check the Hash of the Sections
+	//printf("THUNK-ENTRY XOR: %08X\n",xorthunk()) ;
+	//printf("DEGUG-ENTRY XOR: %08X\n",xorentry()) ;
+	
          sechdr = (XBE_SECTION *)(((char *)xbe) + (int)header->Sections - (int)header->BaseAddress);
     	 
          for (i = 0; i < header->NumSections; i++, sechdr++) {

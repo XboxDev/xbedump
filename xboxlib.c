@@ -75,7 +75,7 @@ unsigned char Testkey[] = {
 	0x29,0x1C,0xDA,0x27,0x20,0xC9,0x6F,0x11,0xEE,0x1B,0xEB,0xFB,0x00,0x6A,0xDA,0x72
  	
 };
-
+                  
 unsigned char xboxPublicKeyData[] = {
  	0x52,0x53,0x41,0x31, 0x08,0x01,0x00,0x00, 0x00,0x08,0x00,0x00, 0xff,0x00,0x00,0x00,
  	0x01,0x00,0x01,0x00, 
@@ -152,7 +152,7 @@ int decrypt_signature(unsigned char *c_number,unsigned char *cryptbuffer){
     
     BN_mod_exp(rsa_out,rsa_signature,rsa_exp,rsa_mod,ctx);
   
-    /*
+/*    
     printf("\n");
     printf("Crypted:\n");
     BN_print(out,rsa_signature);printf("\n"); 
@@ -163,7 +163,7 @@ int decrypt_signature(unsigned char *c_number,unsigned char *cryptbuffer){
     printf("\n");
     printf("Result:\n");
     BN_print(out,rsa_out);printf("\n"); 
-    */
+  */  
     
     // as the first 00 are striped off, attach again to the string
 
@@ -433,6 +433,47 @@ int load_rsa(unsigned int dumpflag)
 	
 	return 0;
 }
+  
+unsigned int xorthunk(int modus) {
+	
+     	unsigned int xortemp[5+64];
+	unsigned int resulting=0;	
+	
+	if (modus==0){
+		memcpy(&xortemp[0],&xePublicKeyData,20+256);
+		resulting = xortemp[0x21]^xortemp[0x22];	
+	}
+	if (modus==1){	
+		// Patch mode
+		memcpy(&xortemp[0],&xboxPublicKeyData[0],20+256);		
+		resulting = xortemp[0x21]^xortemp[0x22];	
+		memcpy(&xortemp[0],&Testkey[0],20+256);		
+		resulting ^= xortemp[0x21]^xortemp[0x22];			
+	}
+	return resulting;
+}
+
+unsigned int xorentry(int modus) {
+	
+	unsigned int xortemp[5+64];
+	unsigned int resulting=0;	
+
+	if (modus==0){
+		memcpy(&xortemp[0],&xePublicKeyData,20+256);
+		resulting = xortemp[0x20]^xortemp[0x24];	
+	}
+	if (modus==1){	
+		// Patch mode
+		memcpy(&xortemp[0],&xboxPublicKeyData[0],20+256);		
+		resulting = xortemp[0x20]^xortemp[0x24];	
+		memcpy(&xortemp[0],&Testkey[0],20+256);		
+		resulting ^= xortemp[0x20]^xortemp[0x24];			
+	}
+	
+	return resulting;
+}
+
+
 
 int read_rsafromflash(char *filename,unsigned int dumpflag)
 {

@@ -154,7 +154,7 @@ int dumpxbe (void *xbe,unsigned int option_flag){
   
     unsigned int KernelThunkTable;     
     unsigned char sha_Message_Digest[20];
-
+    unsigned int xorkey;
     
 
     
@@ -191,8 +191,14 @@ if (option_flag & 0x00000001) {
 
 }
    //      EntryPoint = (unsigned int)header->EntryPoint ^ 0xa8fc57ab; /* debug: 0x0x94859d4b */
-if (option_flag & 0x00000001) {
-         printf("Entry Point                         : 0x%08X (Retail: 0x%08X  Debug: 0x%08X )\n", (unsigned int)header->EntryPoint,(unsigned int)header->EntryPoint^0xa8fc57ab,(unsigned int)header->EntryPoint^0x94859d4b);
+if (option_flag & 0x00000001) {                      
+	 xorkey=xorentry(0);
+         printf("Entry Point                         : 0x%08X (Actual: 0x%08X  Retail: 0x%08X Debug: 0x%08X)\n", 
+         (unsigned int)header->EntryPoint,
+         (unsigned int)header->EntryPoint^xorkey,
+         (unsigned int)header->EntryPoint^0xa8fc57ab,
+         (unsigned int)header->EntryPoint^0x94859d4b);
+         
          printf("Pointer to TLS directory            : 0x%08X\n", (unsigned int)header->TlsDirectory);
          printf("Stack commit size                   : 0x%08X\n", (unsigned int)header->StackCommit);
          printf("Heap reserve size                   : 0x%08X\n", (unsigned int)header->HeapReserve);
@@ -208,10 +214,22 @@ if (option_flag & 0x00000001) {
          printunicode( (short int *) (((char *)xbe)+(unsigned int)header->PcExeFilenameUnicode-(unsigned int)header->BaseAddress));
          printf("\")\n");
 }         
-         KernelThunkTable = (unsigned int)header->KernelThunkTable ^ 0x5b6d40b6; /* debug: 0xEFB1F152 */
+         //KernelThunkTable = (unsigned int)header->KernelThunkTable ^ 0x5b6d40b6; /* debug: 0xEFB1F152 */
+
+         xorkey=xorthunk(0);
+         KernelThunkTable = (unsigned int)header->KernelThunkTable ^ xorkey; 
 
 if (option_flag & 0x00000001) {
-         printf("Pointer to kernel thunk table       : 0x%08X\n", (unsigned int)KernelThunkTable);
+
+         printf("Pointer to kernel thunk table       : 0x%08X (Actual: 0x%08X  Retail: 0x%08X Debug: 0x%08X)\n", 
+         (unsigned int)header->KernelThunkTable,
+         (unsigned int)header->KernelThunkTable^xorkey,
+         (unsigned int)header->KernelThunkTable^0x5b6d40b6,
+         (unsigned int)header->KernelThunkTable^0xEFB1F152);   
+	 
+	 
+     
+         
          printf("Non-kernel import table (debug only): 0x%08X\n", (unsigned int)header->DebugImportTable);
          printf("Number of library headers           : 0x%08X\n", header->NumLibraries);
          printf("Pointer to library headers          : 0x%08X\n", (unsigned int)header->Libraries);
@@ -299,6 +317,7 @@ if (option_flag & 0x00000002) {
      	//(int)header->BaseAddress);
          
 	if (option_flag & 0x00000001) {
+     /*
          printf("\nThread Local Storage Directory - Still Buggy\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
          printf("Raw data start address              : 0x%08X\n", tls->RawStart);
          printf("Raw data end address                : 0x%08X\n", tls->RawEnd);
@@ -307,6 +326,7 @@ if (option_flag & 0x00000002) {
          printf("Size of zero fill                   : 0x%08x\n", tls->SizeZeroFill);
          //printf("Characteristics                     : 0x%08X\n", (unsigned char *)xbe+(unsigned int)tls->Characteristics-(unsigned int)header->BaseAddress);
          printf("Characteristics                     : %s\n", tls->Characteristics);
+         */
 	}    
              
    //   free(xbe);  

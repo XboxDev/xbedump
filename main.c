@@ -47,7 +47,7 @@ void usage(){
 	
 	"  ---- Special Options -----\n\n"
 	"   -sign        Special Option, Signes the xbe with the key who is stored in the xboxlib.c\n"
-	"                Leaves the XOR unchanged\n"
+	"                patches the XOR Keys\n"
 	"   ?            Display Help\n\n"
 	
 	"  Note:         This code will work on little-endian 32-bit machines only! \n\n"
@@ -117,6 +117,7 @@ int main (int argc, const char * argv[])
 				dumpflag |= 0x00020000;  // Write Back
 				dumpflag |= 0x00040000;  // Generate Certificate
 				dumpflag |= 0x00080000;  // Generate Signature
+				dumpflag |= 0x00100000;  // Patch the XOR Keys
 				dumpflag |= 0x10000000;  // Use Linux Test Keys
 				verifyagain=1;
 			}

@@ -25,3 +25,5 @@ int VerifyCertificatex(void *xbe);
 int load_rsa(unsigned int dumpflag);
 
 int load_xbefile(unsigned int &xbe,unsigned int &filesize,char *filename);
+unsigned int xorentry(int modus);
+unsigned int xorthunk(int modus);

@@ -37,7 +37,7 @@ typedef struct _XBE_HEADER {
 	// 124 Initialization flags
 	unsigned int InitFlags;
 	// 128 Entry point (XOR'd; see xboxhacker.net)
-	void* EntryPoint;
+	unsigned int EntryPoint;
 	// 12C Pointer to TLS directory
 	struct _XBE_TLS_DIRECTORY *TlsDirectory;
 	// 130 Stack commit size
@@ -61,7 +61,7 @@ typedef struct _XBE_HEADER {
 	// 154 PC filename (Unicode version of PcExeFilename)
 	void* PcExeFilenameUnicode;
 	// 158 Pointer to kernel thunk table (XOR'd; EFB1F152 debug)
-	unsigned int *KernelThunkTable;
+	unsigned int KernelThunkTable;
 	// 15C Non-kernel import table (debug only)
 	void* DebugImportTable;
 	// 160 Number of library headers
