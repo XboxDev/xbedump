@@ -76,7 +76,7 @@ unsigned char Testkey[] = {
                   
 unsigned char xboxPublicKeyData[] = {
  	0x52,0x53,0x41,0x31, 0x08,0x01,0x00,0x00, 0x00,0x08,0x00,0x00, 0xff,0x00,0x00,0x00,
- 	0x01,0x00,0x01,0x00, 
+ 	0x03,0x00,0x00,0x00, 
  	// Public Modulus "m"
  	0xd3,0xd7,0x4e,0xe5, 0x66,0x3d,0xd7,0xe6, 0xc2,0xd4,0xa3,0xa1, 0xf2,0x17,0x36,0xd4, 
  	0x2e,0x52,0xf6,0xd2, 0x02,0x10,0xf5,0x64, 0x9c,0x34,0x7b,0xff, 0xef,0x7f,0xc2,0xee,
@@ -189,16 +189,19 @@ void gigimport(giant g, unsigned char *buff,int len){
 	int count;
 	memcpy(g->n,buff,len);
 	g->sign = len/2;
+	
 	// Correcting to bits now
-	for (count = (len-1);count!=0;count--) {
-		if (buff[count] != 0x00) {
+	for (count = g->sign ;count!=0;count--) {
+		
+		if (g->n[count] != 0x00) {
 			count = count+1;
 			break;      
 		}
 	}                                      
 
-	if ((count%2) == 1) count = count +1;
-	g->sign= count/2;
+	g->sign= count;
+	if (g->sign==0) g->sign = 1;
+	
 
 }
 
@@ -428,9 +431,9 @@ int generate_habibi(void){
 	itog(2, p);	// p = 2
 	mulg(p, phi);	// phi = phi * p
      
-     	gigimport(p,&Testkey[16],4);
+	gigimport(p,&Testkey[16],4); 	
+	
 	invg(phi,p);
-
         memcpy(&Testkey[20+256],p->n,256);
 	//gout(phi);
 
