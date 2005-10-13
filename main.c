@@ -26,37 +26,36 @@
 
 void usage(){
 	
- printf("\n"	
-	 
-	"  Usage:    xbe [xbefile] [options]\n\n"
+ printf(
+	"Usage: xbe [xbefile] [options]\n\n"
 	
-	"   -da          Dumps the compleate XBE Header Structure\n"
-	"   -dh          Dumps the Header info\n"
-	"   -dc          Dumps the Certificate\n"
-	"   -ds          Dumps the Sections\n"
-	"   -dl          Dumps the Libary Sections\n\n"
+	"  -da          Dumps the complete XBE Header Structure\n"
+	"  -dh          Dumps the Header info\n"
+	"  -dc          Dumps the Certificate\n"
+	"  -ds          Dumps the Sections\n"
+	"  -dl          Dumps the Library Sections\n\n"
 	
-	"   -vh          Verifies the .xbe Header \n"
-	"   -wb          Writes back the update to file out.xbe \n\n"
+	"  -vh          Verifies the .xbe Header \n"
+	"  -wb          Writes back the update to file out.xbe \n\n"
 	
-	"   -sm          Uses Microsoft Signature (default mode)\n"
-	"                (Note: Signing not possible, as we do not have the private key)\n"
-	"   -shabibi     Uses the Habibi Signature Keys\n\n"
-	"   -st          Uses the Test Keys i have created .. leaves the XOR unchanged\n\n"
+	"  -sm          Uses Microsoft Signature (default mode)\n"
+	"               (Note: Signing not possible, as we do not have the private key)\n"
+	"  -shabibi     Uses the Habibi Signature Keys\n"
+	"  -st          Uses the Test Keys i have created .. leaves the XOR unchanged\n\n"
 		
-	"   -d1          Debugoutput for option -vh\n\n"
+	"  -d1          Debug output for option -vh\n\n"
 	
 	"  ---- Special Options -----\n\n"
-	"   -habibi      Special Option, Signes the xbe with Habibi Key and Sets all media flags\n\n"
-	"   -sign        Special Option, Signes the xbe with the key who is stored in the xboxlib.c\n"
-	"                patches the XOR Keys\n"
 	
-	"   -xbgs        Dumps xbgs output\n"
-	"   ?            Display Help\n\n"
+	"  -habibi      Special Option, Signs the xbe with Habibi Key and Sets all media flags\n"
+	"  -sign        Special Option, Signs the xbe with the key who is stored in the xboxlib.c\n"
+	"               patches the XOR Keys\n"
+	"  -xbgs        Dumps xbgs output\n"
+	"  ?            Display Help\n\n"
+
+	"Note: This code will work on little-endian 32-bit machines only! \n\n"
 	
-	"  Note:         This code will work on little-endian 32-bit machines only! \n\n"
-	
-	"  (C)2002,2003 by XBL Team (hamtitampti) \n");
+	"(C)2002,2003 by XBL Team (hamtitampti) \n");
 	
 	
 }
@@ -172,7 +171,6 @@ int main (int argc, const char * argv[])
 
 	}
 
-	printf("\n");
 	return 0;
 }
 
