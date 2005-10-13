@@ -587,8 +587,8 @@ int load_xbefile(unsigned int &xbe,unsigned int &filesize,char *filename) {
          fread(file, 1, filesize, f);
          fclose(f);	
    } else {
-        printf("File Not found %s, use parameter filename \n",filename);
-   	      
+	fprintf(stderr,"Error opening %s - %s\n",filename,strerror(errno));
+	exit(1);
     }
 	return 0;
 }

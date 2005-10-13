@@ -70,9 +70,12 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 	eax += 0x10000;
 	
 	// Validates the Certificate Entry Address 
-	printf("Certificate Adress:    ");
+	printf("Certificate Address:   ");
 	if (eax == (int)header->Certificate) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 
+	// Only continue if xbe is valid
+	if (fail == 1) { fprintf(stderr,"Invalid xbe\n"); exit(1); }
+	
 	printf("Certificate Size  :    ");
 	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
 	if (cert->Size>=0x1d0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
@@ -176,11 +179,15 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 	if (fail==0) printf("\nXBE file integrity:    OK\n"); else  printf("\nXBE file integrity:    FALSE !!!!!!! FALSE !!!!!\n");
 	
 	if (option_flag & 0x00020000){
-	 f = fopen("out.xbe", "wb");
-	 fwrite(xbe, 1, filesize, f);
-         
-         fclose(f);	
-		
+		f = fopen("out.xbe", "wb");
+		if (f==NULL) {
+			fprintf(stderr,"\nError writing out.xbe - %s\n",strerror(errno));
+			exit(1);
+		}
+		else {
+			fwrite(xbe, 1, filesize, f);
+			fclose(f);	
+		}	
 	}
 
 	
