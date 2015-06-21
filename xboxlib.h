@@ -24,6 +24,6 @@ int read_rsafromflash(char *filename,unsigned int dumpflag);
 int VerifyCertificatex(void *xbe);
 int load_rsa(unsigned int dumpflag);
 
-int load_xbefile(unsigned int &xbe,unsigned int &filesize,char *filename);
+int load_xbefile(void* &xbe,unsigned int &filesize,char *filename);
 unsigned int xorentry(int modus);
 unsigned int xorthunk(int modus);

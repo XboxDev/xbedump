@@ -57,10 +57,12 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 	printf("Magic XBEH value:      ");
 	if (memcmp(header->Magic, "XBEH", 4)==0) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 	
+#if 0
 	// If the header has the correct size, error ???  
 	printf("Header Size:           ");
-	if (header->XbeHeaderSize == 0x178) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
-		
+	if (header->XbeHeaderSize == 0x178) { printf("pass\n"); } else { fail=1; printf("fail (0x%X)\n",header->XbeHeaderSize); }
+#endif		
+
 	// If the image base is not 00010000,
 	printf("Image Base Address:    ");
 	if (((int)header->BaseAddress)== 0x10000)  { printf("pass\n"); } else { fail=1; printf("fail\n"); }
@@ -74,7 +76,7 @@ int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag){
 	if (eax == (int)header->Certificate) { printf("pass\n"); } else { fail=1; printf("fail\n"); }
 
 	// Only continue if xbe is valid
-	if (fail == 1) { fprintf(stderr,"Invalid xbe\n"); exit(1); }
+	//if (fail == 1) { fprintf(stderr,"Invalid xbe\n"); exit(1); }
 	
 	printf("Certificate Size  :    ");
 	cert = (XBE_CERTIFICATE *)(((char *)xbe) + (int)header->Certificate - (int)header->BaseAddress);
