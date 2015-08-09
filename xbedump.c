@@ -26,6 +26,7 @@
 
 #include "xbestructure.h"
 #include "xboxlib.h"
+#include "xboxkrnl.h"
 
 
 void printdate(uint32_t  t_time) {
@@ -252,7 +253,18 @@ void printFlags(int f) {
     }
 }
 
-
+XBE_SECTION *findSection(void *xbe, uint32_t addr) {
+    int i;
+    XBE_HEADER *header = (XBE_HEADER*) xbe;
+    XBE_SECTION *sechdr = (XBE_SECTION *)(((char *)xbe) + (int)header->Sections - (int)header->BaseAddress);
+    for (i = 0; i < header->NumSections; i++, sechdr++) {
+        if (addr < sechdr->VirtualAddress) { continue; }
+        if (addr >= sechdr->VirtualAddress + sechdr->VirtualSize) { continue; }
+        return sechdr;
+    }
+printf("Couldn't find 0x%X\n",addr);
+    return NULL;
+}
 
 int dumpxbe (void *xbe,uint32_t  option_flag){
     int warn;
@@ -341,9 +353,9 @@ if (option_flag & 0x00000001) {
          printf("PE timestamp                        : 0x%08X ",(uint32_t )header->PeTimestamp);
          	printdate(header->PeTimestamp);
          printf("PC path and filename to EXE         : 0x%08X (\"%s\")\n",(uint32_t)header->PcExePath, ((char *)xbe)+(uintptr_t)header->PcExePath-(uintptr_t)header->BaseAddress);
-         printf("PC filename to EXE                  : 0x%08X (\"%s\"\n", (uint32_t)header->PcExeFilename,((char *)xbe)+(uintptr_t)header->PcExeFilename-(uintptr_t)header->BaseAddress);
+         printf("PC filename to EXE                  : 0x%08X (\"%s\")\n", (uint32_t)header->PcExeFilename,((char *)xbe)+(uintptr_t)header->PcExeFilename-(uintptr_t)header->BaseAddress);
          printf("PC filename to EXE (Unicode)        : 0x%08X (\"",(uint32_t)header->PcExeFilenameUnicode);
-         printunicode( (short int *) (((char *)xbe)+(uint32_t)header->PcExeFilenameUnicode-(uintptr_t)header->BaseAddress));
+         printunicode( (short int*) (((char *)xbe)+(uintptr_t)header->PcExeFilenameUnicode-(uintptr_t)header->BaseAddress));
          printf("\")\n");
 }         
          //KernelThunkTable = (uint32_t )header->KernelThunkTable ^ 0x5b6d40b6; /* debug: 0xEFB1F152 */
@@ -360,10 +372,37 @@ if (option_flag & 0x00000001) {
          (uint32_t )header->KernelThunkTable,
          (uint32_t )header->KernelThunkTable^xorkey,
          (uint32_t )header->KernelThunkTable^0x5b6d40b6,
-         (uint32_t )header->KernelThunkTable^0xEFB1F152);   
-	 
-	 
-     
+         (uint32_t )header->KernelThunkTable^0xEFB1F152);
+
+         /* FIXME: Move elsewhere */
+         /* FIXME: Allow use of retail key from cli! */
+         uint32_t kt = header->KernelThunkTable^0xEFB1F152;
+         while(1) {
+             XBE_SECTION *kt_section = findSection(xbe, kt);
+             if (kt_section == NULL) {
+                 printf("Kernel thunk table broken!\n");
+                 break;
+             }
+             uint32_t* kt_entry = (uint32_t *)((uint8_t *)xbe + kt_section->FileAddress + kt - kt_section->VirtualAddress);
+             if (*kt_entry == 0) {
+                 break;
+             }
+             const char *name;
+             unsigned int index = *kt_entry & 0x7FFFFFFF;
+             if (index < sizeof(xboxkrnlExports) / sizeof(const char*)) {
+                name = xboxkrnlExports[index];
+             } else {
+                name = NULL;
+             }
+             printf("Kernel import                       : 0x%08X (@%d%s%s%s)\n",
+             *kt_entry,
+             index,
+             name ? ", \"" : "",
+             name ? name : "",
+             name ? "\"" : "");
+             kt += 4;
+         }
+
          
          printf("Non-kernel import table (debug only): 0x%08X\n", (uint32_t )header->DebugImportTable);
          printf("Number of library headers           : 0x%08X\n", header->NumLibraries);
