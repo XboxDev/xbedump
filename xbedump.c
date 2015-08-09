@@ -394,12 +394,11 @@ if (option_flag & 0x00000001) {
              } else {
                 name = NULL;
              }
-             printf("Kernel import                       : 0x%08X (@%d%s%s%s)\n",
+             printf("Kernel import                       : 0x%08X (@%d%s%s)\n",
              *kt_entry,
              index,
-             name ? ", \"" : "",
-             name ? name : "",
-             name ? "\"" : "");
+             name ? ", " : "",
+             name ? name : "");
              kt += 4;
          }
 
