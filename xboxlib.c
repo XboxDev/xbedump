@@ -569,7 +569,7 @@ int read_rsafromflash(char *filename,unsigned int dumpflag)
 }
            
            
-int load_xbefile(unsigned int &xbe,unsigned int &filesize,char *filename) {
+int load_xbefile(void* &xbe,unsigned int &filesize,char *filename) {
   
    FILE *f;
    void *file;
@@ -583,7 +583,7 @@ int load_xbefile(unsigned int &xbe,unsigned int &filesize,char *filename) {
 //         printf("Loading file %s (%i bytes)\n", filename, filesize);
          
          file = malloc(filesize);
-         xbe=(unsigned int)file;
+         xbe=file;
          fread(file, 1, filesize, f);
          fclose(f);	
    } else {

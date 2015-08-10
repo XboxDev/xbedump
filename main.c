@@ -66,7 +66,7 @@ int main (int argc, const char * argv[])
 	unsigned int dumpflag=0;
 	char filename[512];
 	int verifyagain=0;
-	unsigned int xbefile;
+	void* xbefile;
 	unsigned int filesize;
 	
 //      dumpxbe("secret/xboxdash.xbe");
@@ -142,11 +142,11 @@ int main (int argc, const char * argv[])
 		
 		if (dumpflag & 0x00000FFF) {
 				load_xbefile(xbefile,filesize,&filename[0]);
-				dumpxbe((void *)xbefile,dumpflag);
+				dumpxbe(xbefile,dumpflag);
 				}
 		if (dumpflag & 0x0fff0000) {
 				load_xbefile(xbefile,filesize,&filename[0]);						
-				validatexbe((void *)xbefile,filesize,dumpflag);
+				validatexbe(xbefile,filesize,dumpflag);
 				}
 						
 		// Verify the signed file
@@ -157,9 +157,9 @@ int main (int argc, const char * argv[])
 				dumpflag |= 0x10000000;  // Use Linux Test Keys
 				strcpy(&filename[0],"out.xbe");
 				printf("\n File out.xbe created, verifying it ...\n\n");
-				free((void *)xbefile);
+				free(xbefile);
 				load_xbefile(xbefile,filesize,&filename[0]);
-				validatexbe((void *)xbefile,filesize,dumpflag);
+				validatexbe(xbefile,filesize,dumpflag);
 				
 			}
 		

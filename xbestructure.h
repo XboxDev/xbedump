@@ -11,160 +11,162 @@
  ***************************************************************************/
 
 
+#include <stdint.h>
+
 // XBE header information
 typedef struct _XBE_HEADER {
 	// 000 "XBEH"
-	char Magic[4];
+	uint8_t Magic[4];
 	// 004 RSA digital signature of the entire header area
-	unsigned char HeaderSignature[256];
-	//unsigned int HeaderSignature[64];
+	uint8_t HeaderSignature[256];
+	//uint32_t  HeaderSignature[64];
 	// 104 Base address of XBE image (must be 0x00010000?)
-	void* BaseAddress;
+	uint32_t  BaseAddress;
 	// 108 Size of all headers combined - other headers must be within this
-	unsigned int HeaderSize;
+	uint32_t  HeaderSize;
 	// 10C Size of entire image
-	unsigned int ImageSize;
+	uint32_t  ImageSize;
 	// 110 Size of this header (always 0x178?)
-	unsigned int XbeHeaderSize;
+	uint32_t  XbeHeaderSize;
 	// 114 Image timestamp - unknown format
-	unsigned int Timestamp;
+	uint32_t  Timestamp;
 	// 118 Pointer to certificate data (must be within HeaderSize)
-	struct _XBE_CERTIFICATE *Certificate;
+	/*struct _XBE_CERTIFICATE */ uint32_t Certificate;
 	// 11C Number of sections
-	int NumSections;
+	int32_t NumSections;
 	// 120 Pointer to section headers (must be within HeaderSize)
-	struct _XBE_SECTION *Sections;
+	/*struct _XBE_SECTION */ uint32_t Sections;
 	// 124 Initialization flags
-	unsigned int InitFlags;
-	// 128 Entry point (XOR'd; see xboxhacker.net)
-	unsigned int EntryPoint;
+	uint32_t  InitFlags;
+	// 128 Entry point32_t (XOR'd; see xboxhacker.net)
+	uint32_t  EntryPoint;
 	// 12C Pointer to TLS directory
-	struct _XBE_TLS_DIRECTORY *TlsDirectory;
+	/*struct _XBE_TLS_DIRECTORY */ uint32_t TlsDirectory;
 	// 130 Stack commit size
-	unsigned int StackCommit;
+	uint32_t  StackCommit;
 	// 134 Heap reserve size
-	unsigned int HeapReserve;
+	uint32_t  HeapReserve;
 	// 138 Heap commit size
-	unsigned int HeapCommit;
+	uint32_t  HeapCommit;
 	// 13C PE base address (?)
-	void* PeBaseAddress;
+	uint32_t  PeBaseAddress;
 	// 140 PE image size (?)
-	unsigned int PeImageSize;
+	uint32_t  PeImageSize;
 	// 144 PE checksum (?)
-	unsigned int PeChecksum;
+	uint32_t  PeChecksum;
 	// 148 PE timestamp (?)
-	unsigned int PeTimestamp;
+	uint32_t  PeTimestamp;
 	// 14C PC path and filename to EXE file from which XBE is derived
-	char* PcExePath;
+	/*uint8_t*/ uint32_t PcExePath;
 	// 150 PC filename (last part of PcExePath) from which XBE is derived
-	char* PcExeFilename;
+	/*uint8_t*/ uint32_t PcExeFilename;
 	// 154 PC filename (Unicode version of PcExeFilename)
-	void* PcExeFilenameUnicode;
+	uint32_t  PcExeFilenameUnicode;
 	// 158 Pointer to kernel thunk table (XOR'd; EFB1F152 debug)
-	unsigned int KernelThunkTable;
+	uint32_t  KernelThunkTable;
 	// 15C Non-kernel import table (debug only)
-	void* DebugImportTable;
+	uint32_t  DebugImportTable;
 	// 160 Number of library headers
-	int NumLibraries;
+	int32_t NumLibraries;
 	// 164 Pointer to library headers
-	struct _XBE_LIBRARY *Libraries;
+	/*struct _XBE_LIBRARY */ uint32_t Libraries;
 	// 168 Pointer to kernel library header
-	struct _XBE_LIBRARY *KernelLibrary;
+	/*struct _XBE_LIBRARY */ uint32_t KernelLibrary;
 	// 16C Pointer to XAPI library
-	struct _XBE_LIBRARY *XapiLibrary;
+	/*struct _XBE_LIBRARY */ uint32_t XapiLibrary;
 	// 170 Pointer to logo bitmap (NULL = use default of Microsoft)
-	void* LogoBitmap;
+	uint32_t  LogoBitmap;
 	// 174 Size of logo bitmap
-	unsigned int LogoBitmapSize;
+	uint32_t  LogoBitmapSize;
 	// 178
 } XBE_HEADER, *PXBE_HEADER;
 
 // Certificate structure
 typedef struct _XBE_CERTIFICATE {
 	// 000 Size of certificate
-	unsigned int Size;
+	uint32_t  Size;
 	// 004 Certificate timestamp (unknown format)
-	unsigned int Timestamp;
+	uint32_t  Timestamp;
 	// 008 Title ID
-	unsigned int TitleId;
+	uint32_t  TitleId;
 	// 00C Name of the game (Unicode)
-	short TitleName[40];
+	int16_t TitleName[40];
 	// 05C Alternate title ID's (0-terminated)
-	unsigned int AlternateTitleIds[16];
+	uint32_t  AlternateTitleIds[16];
 	// 09C Allowed media types - 1 bit match between XBE and media = boots
-	unsigned int MediaTypes;
+	uint32_t  MediaTypes;
 	// 0A0 Allowed game regions - 1 bit match between this and XBOX = boots
-	unsigned int GameRegion;
+	uint32_t  GameRegion;
 	// 0A4 Allowed game ratings - 1 bit match between this and XBOX = boots
-	unsigned int GameRating;
+	uint32_t  GameRating;
 	// 0A8 Disk number (?)
-	unsigned int DiskNumber;
+	uint32_t  DiskNumber;
 	// 0AC Version (?)
-	unsigned int Version;
+	uint32_t  Version;
 	// 0B0 LAN key for this game
-	unsigned char LanKey[16];
+	uint8_t LanKey[16];
 	// 0C0 Signature key for this game
-	unsigned char SignatureKey[16];
+	uint8_t SignatureKey[16];
 	// 0D0 Signature keys for the alternate title ID's
-	unsigned char AlternateSignatureKeys[16][16];
+	uint8_t AlternateSignatureKeys[16][16];
 	// 1D0
 } XBE_CERTIFICATE, *PXBE_CERTIFICATE;
 
 // Section headers
 typedef struct _XBE_SECTION {
 	// 000 Flags
-	unsigned int Flags;
+	uint32_t  Flags;
 	// 004 Virtual address (where this section loads in RAM)
-	//unsigned int VirtualAddress;
-	unsigned int VirtualAddress;
+	//uint32_t  VirtualAddress;
+	uint32_t  VirtualAddress;
 	// 008 Virtual size (size of section in RAM; after FileSize it's 00'd)
-	unsigned int VirtualSize;
+	uint32_t  VirtualSize;
 	// 00C File address (where in the file from which this section comes)
-	unsigned int FileAddress;
+	uint32_t  FileAddress;
 	// 010 File size (size of the section in the XBE file)
-	unsigned int FileSize;
+	uint32_t  FileSize;
 	// 014 Pointer to section name
-	char* SectionName;
+	/*uint8_t*/ uint32_t SectionName;
 	// 018 Section reference count - when >= 1, section is loaded
-	int SectionReferenceCount;
+	int32_t SectionReferenceCount;
 	// 01C Pointer to head shared page reference count
-	short *HeadReferenceCount;
+	/*int16_t */ uint32_t HeadReferenceCount;
 	// 020 Pointer to tail shared page reference count
-	short *TailReferenceCount;
-	// 024 SHA1 hash.  Hash int containing FileSize, then hash section.
-	unsigned char ShaHash[20];
+	/*int16_t */ uint32_t TailReferenceCount;
+	// 024 SHA1 hash.  Hash int32_t containing FileSize, then hash section.
+	uint8_t ShaHash[20];
 	// 038
 } XBE_SECTION, *PXBE_SECTION;
 
 // TLS directory information
 typedef struct _XBE_TLS {
         // 000 raw data start address
-        int RawStart;
+        int32_t RawStart;
         // 004 raw data end address
-        int RawEnd;
+        int32_t RawEnd;
         // 008 TLS index address
-        int TlsIndex;
+        int32_t TlsIndex;
         // 00C TLS callbacks address
-        int TlsCallbacks;
+        int32_t TlsCallbacks;
         // 010 size of zero fill
-        int SizeZeroFill;
-        // 014 Characteristics
-        unsigned char Characteristics[8];
+        int32_t SizeZeroFill;
+        // 014 uint8_tacteristics
+        uint8_t uint8_tacteristics[8];
         // 01C
 } XBE_TLS, *PXBE_TLS;
 
 // Library version data
 typedef struct _XBE_LIBRARY {
     // 000 Library Name
-    char Name[8];
+    uint8_t Name[8];
     // 008 Major Version
-    short MajorVersion;
+    int16_t MajorVersion;
     // 00A Middle Version
-    short MiddleVersion;
+    int16_t MiddleVersion;
     // 00C Minor Version
-    short MinorVersion;
+    int16_t MinorVersion;
     // 00E Flags
-    short Flags;
+    int16_t Flags;
     // 010
 } XBE_LIBRARY, *PXBELIBRARY;
 
@@ -200,7 +202,7 @@ typedef struct _XBE_LIBRARY {
 #define XBE_SEC_RO_HEAD_PAGE            0x00000010
 #define XBE_SEC_RO_TAIL_PAGE            0x00000020
 
-void shax(unsigned char *result, unsigned char *data, unsigned int len);
-int validatexbe(void *xbe,unsigned int filesize,unsigned int option_flag);
-int dumpxbe (void *xbe,unsigned int option_flag);
+void shax(uint8_t *result, uint8_t *data, uint32_t  len);
+int32_t validatexbe(void *xbe,uint32_t  filesize,uint32_t  option_flag);
+int32_t dumpxbe (void *xbe,uint32_t  option_flag);
 

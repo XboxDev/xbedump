@@ -1,3 +1,9 @@
+# xbedump
+A hack of xbedump to support 64 bit compilation (and bugfixes)
+
+#Original Readme:
+
+```
 XBE Dumper 0.4
 ---------------
 
@@ -81,3 +87,4 @@ Changelog
 0.3c Generation of a "custom signature" implemented
 
 (this document by andy@warmcat.com & franz@caos.at)
+```
