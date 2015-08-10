@@ -1,5 +1,7 @@
 # xbedump
-A hack of xbedump to support 64 bit compilation (and bugfixes)
+Modifications and bugfixes of xbedump for the XQEMU project.
+
+Upstream: http://xbox.cvs.sourceforge.net/viewvc/xbox-linux/xbedump/
 
 #Original Readme:
 
