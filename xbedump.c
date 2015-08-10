@@ -375,8 +375,8 @@ if (option_flag & 0x00000001) {
          (uint32_t )header->KernelThunkTable^0xEFB1F152);
 
          /* FIXME: Move elsewhere */
-         /* FIXME: Allow use of retail key from cli! */
-         uint32_t kt = header->KernelThunkTable^0xEFB1F152;
+         /* FIXME: Allow use of other keys from cli! */
+         uint32_t kt = KernelThunkTable;
          while(1) {
              XBE_SECTION *kt_section = findSection(xbe, kt);
              if (kt_section == NULL) {
