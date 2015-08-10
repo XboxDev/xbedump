@@ -46,7 +46,7 @@
  */
 #define MAX_SHORTS (1<<19)	
 
-#define INFINITY (-1)
+#define GIANT_INFINITY (-1)
 #define FA 0
 #define TR 1
 #define COLUMNWIDTH 64
@@ -135,7 +135,7 @@ double			s_sin(int);
 double			s_cos(int);
 
 
-/* Creates a new giant, numshorts = INFINITY invokes the
+/* Creates a new giant, numshorts = GIANT_INFINITY invokes the
  * maximum MAX_SHORTS. */
 giant 			newgiant(int numshorts);
 
