@@ -106,7 +106,7 @@ static void		pushg(int);
 int 		gerr(void);
 double		gfloor(double);
 int			radixdiv(int, int, giant);
-void		columnwrite(FILE *, short *, char *, short, int);
+void		columnwrite(FILE *, short *, const char *, short, int);
 
 void		normal_addg(giant, giant);
 void		normal_subg(giant, giant);
@@ -587,7 +587,7 @@ void
 columnwrite(
 	FILE 	*filepointer,
 	short 	*column,
-	char 	*format,
+	const char 	*format,
 	short 	arg,
 	int 	newlines
 )

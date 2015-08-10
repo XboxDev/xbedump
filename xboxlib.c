@@ -98,7 +98,7 @@ unsigned char xboxPublicKeyData[] = {
  	// Could somebody insert it ?
  };
  
-typedef struct RSA_PUBLIC_KEY
+struct RSA_PUBLIC_KEY
 {
 	char Magic[4];  		// "RSA1"
 	unsigned int Bloblen; 		// 264 (Modulus + Exponent + Modulussize)
@@ -111,7 +111,7 @@ typedef struct RSA_PUBLIC_KEY
 struct RSA_PUBLIC_KEY xePublicKeyData;
 
 // Asterix .bin File format structure
-typedef struct XboxKey
+struct XboxKey
 {
 	// Magic string ("RSA1")
 	uint8_t magic[4];
@@ -208,9 +208,9 @@ void gigimport(giant g, unsigned char *buff,int len){
 // DE - Crypting
 int decrypt_signature(unsigned char *c_number,unsigned char *cryptbuffer) {
 	
-	giant n = newgiant(INFINITY);	
-	giant e = newgiant(INFINITY);	
-	giant sig = newgiant(INFINITY);	
+	giant n = newgiant(GIANT_INFINITY);	
+	giant e = newgiant(GIANT_INFINITY);	
+	giant sig = newgiant(GIANT_INFINITY);	
 	
  	int count;
         gigimport(sig,c_number,256);
@@ -317,9 +317,9 @@ int crypt_signature(unsigned char *c_number,unsigned char *cryptbuffer){
     	unsigned char c_hash[20];
     	unsigned int a;
 
-	giant n = newgiant(INFINITY);	
-	giant e = newgiant(INFINITY);	
-	giant sig = newgiant(INFINITY);	
+	giant n = newgiant(GIANT_INFINITY);	
+	giant e = newgiant(GIANT_INFINITY);	
+	giant sig = newgiant(GIANT_INFINITY);	
 	
 	gigimport(n,xePublicKeyData.Modulus,256);
 
@@ -414,8 +414,8 @@ int generate_habibi(void){
 	
 	unsigned int temp;
 	
-	giant p = newgiant(INFINITY);	
-	giant phi = newgiant(INFINITY);	
+	giant p = newgiant(GIANT_INFINITY);	
+	giant phi = newgiant(GIANT_INFINITY);	
 
 	memset(&Testkey[0],0x00,20+256+256);
 	memcpy(&Testkey[0],&xboxPublicKeyData[0],20+256);
