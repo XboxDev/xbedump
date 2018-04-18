@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <assert.h>
 #include "xboxlib.h"
 #include "xbestructure.h"
    
@@ -183,52 +184,17 @@ int read_rsafrombin_asterix()
 	//memcpy(&xePublicKeyData,&Testkey[0],20+256+256);
 	return 0;
 }    
- 
-#if 0
-void gigimport(giant g, unsigned char *buff,int len){
-
-	int count;
-	memcpy(g->n,buff,len);
-	g->sign = len/2;
-	
-	// Correcting to bits now
-	for (count = g->sign ;count!=0;count--) {
-		
-		if (g->n[count] != 0x00) {
-			count = count+1;
-			break;      
-		}
-	}                                      
-
-	g->sign= count;
-	if (g->sign==0) g->sign = 1;
-	
-
-}
-#endif
 
 void gigimport(giant g, unsigned char *buff, int len) {
 
 	// copy buffered 'number' into giant's number buffer
-	//int count;
 	memcpy(g->n, buff, len);
 
-	// the giants number buffer stores large numbers as
-	// multiple 16bit numbers, so if the length of our buffer is odd
-	// our number wont fit properly.
-	// to fix this we add a trailing 0x00 byte
-	if (len & 1)
-	{
-		*((unsigned char*)(g->n) + len) = 0x00;
-		len++;
-	}
+	assert((len % 2) == 0);
+
 	g->sign = len / 2;
 
-	if (g->sign == 0)
-	{
-		g->sign = 1;
-		*((unsigned char*)(g->n)) = 0x00;
-	}
+	assert(g->sign != 0);
 }
 
 // DE - Crypting
