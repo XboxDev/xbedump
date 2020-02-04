@@ -33,6 +33,7 @@ void usage(){
 	"  -dc          Dumps the Certificate\n"
 	"  -ds          Dumps the Sections\n"
 	"  -dl          Dumps the Library Sections\n\n"
+	"  -gdb         Dumps sections adresses, for use with gdb\n\n"
 	
 	"  -vh          Verifies the .xbe Header \n"
 	"  -wb          Writes back the update to file out.xbe \n\n"
@@ -82,11 +83,12 @@ int main (int argc, const char * argv[])
 
  	  	for (counter=2;counter<argc;counter++){
    	
-		if (strcmp(argv[counter],"-da")==0)  dumpflag |= 0x000000ff;
- 	  	if (strcmp(argv[counter],"-dh")==0)  dumpflag |= 0x00000001;
- 	  	if (strcmp(argv[counter],"-dc")==0)  dumpflag |= 0x00000002;
- 	  	if (strcmp(argv[counter],"-ds")==0)  dumpflag |= 0x00000004;
-		if (strcmp(argv[counter],"-dl")==0)  dumpflag |= 0x00000008;
+		if (strcmp(argv[counter],"-da")==0)   dumpflag |= 0x000000ff;
+ 	  	if (strcmp(argv[counter],"-dh")==0)   dumpflag |= 0x00000001;
+ 	  	if (strcmp(argv[counter],"-dc")==0)   dumpflag |= 0x00000002;
+ 	  	if (strcmp(argv[counter],"-ds")==0)   dumpflag |= 0x00000004;
+		if (strcmp(argv[counter],"-dl")==0)   dumpflag |= 0x00000008;
+		if (strcmp(argv[counter],"-gdb")==0)  dumpflag |= 0x00000100;
 		
 		if (strcmp(argv[counter],"-sm")==0)  dumpflag |= 0x00000000;
 		if (strcmp(argv[counter],"-st")==0)  dumpflag |= 0x10000000;
