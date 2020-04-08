@@ -184,16 +184,21 @@ int read_rsafrombin_asterix()
 	return 0;
 }    
 
-void gigimport(giant g, unsigned char *buff, int len) {
+void gigimport(giant g, const unsigned char *buff, int len) {
 
 	// copy buffered 'number' into giant's number buffer
 	memcpy(g->n, buff, len);
 
 	assert((len % 2) == 0);
 
+	// Get number of shorts
 	g->sign = len / 2;
 
-	assert(g->sign != 0);
+	// Only count used shorts
+	while((g->sign >= 1) && (g->n[g->sign - 1] == 0)) {
+		g->sign -= 1;
+	}
+
 }
 
 // DE - Crypting
