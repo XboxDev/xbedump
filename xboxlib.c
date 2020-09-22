@@ -432,7 +432,7 @@ int generate_habibi(void){
 	invg(phi,p);
         memcpy(&Testkey[20+256],p->n,256);
 	//gout(phi);
-
+	return 0;
 }
 
 
