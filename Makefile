@@ -1,6 +1,6 @@
 CXX       = g++
 OPT       = -O2
-FLAGS     = $(OPT) -ansi
+FLAGS     = $(OPT) -ansi -Wall -Wextra -pedantic
 
 
 TOPDIR  := $(shell /bin/pwd)
@@ -16,4 +16,3 @@ xbe: ${THINGS} ${CRYPTOLIB}
 	${CXX} -o $@ -lm ${THINGS} 
 clean:
 	-rm -f *.o  xbe core
-        

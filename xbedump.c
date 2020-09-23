@@ -266,14 +266,14 @@ printf("Couldn't find 0x%X\n",addr);
 }
 
 int dumpxbe (void *xbe,uint32_t  option_flag){
-    int warn;
     int i;
+    unsigned int j;
     int a;
  
     XBE_HEADER *header;
     XBE_CERTIFICATE *cert;
     XBE_SECTION *sechdr;
-    XBE_TLS *tls;
+    //XBE_TLS *tls;
     XBE_LIBRARY *lib;
   
     uint32_t  KernelThunkTable;     
@@ -281,8 +281,6 @@ int dumpxbe (void *xbe,uint32_t  option_flag){
     uint32_t  xorkey;
     
 
-    
-    warn = 1;
     
 
      /* header */
@@ -425,10 +423,10 @@ if (option_flag & 0x00000002) {
          printf("Disk number                         : 0x%08X\n", cert->DiskNumber);
          printf("Version                             : 0x%08X\n", cert->Version);
          printf("LAN key                             : "); 
-         for (i = 0; i< sizeof(cert->LanKey);i++) printf("%02X ",cert->LanKey[i]);
+         for (j = 0; j< sizeof(cert->LanKey);j++) printf("%02X ",cert->LanKey[j]);
          printf("\n");
          printf("Signature key                       : "); 
-         for (i = 0; i< sizeof(cert->SignatureKey);i++) printf("%02X ",cert->SignatureKey[i]);
+         for (j = 0; j< sizeof(cert->SignatureKey);j++) printf("%02X ",cert->SignatureKey[j]);
          printf("\n");
 	 printf("Alternate signature keys            : "); 
          printhexm((uint8_t *)cert->AlternateSignatureKeys, sizeof(cert->AlternateSignatureKeys));
@@ -489,7 +487,7 @@ if (option_flag & 0x00000002) {
 
 
     //     tls = (XBE_TLS *)(((char *)xbe) + (int)header->TlsDirectory - (int)header->BaseAddress);
-     	tls = (XBE_TLS *)(((char *)xbe) + (int)header->TlsDirectory - KernelThunkTable );//
+        //tls = (XBE_TLS *)(((char *)xbe) + (int)header->TlsDirectory - KernelThunkTable );//
      	//(int)header->BaseAddress);
          
 	if (option_flag & 0x00000001) {
