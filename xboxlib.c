@@ -208,7 +208,6 @@ int decrypt_signature(unsigned char *c_number,unsigned char *cryptbuffer) {
 	giant e = newgiant(GIANT_INFINITY);	
 	giant sig = newgiant(GIANT_INFINITY);	
 	
- 	int count;
         gigimport(sig,c_number,256);
 
 	gigimport(n,xePublicKeyData.Modulus,256);

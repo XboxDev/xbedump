@@ -92,7 +92,6 @@ int				current_max_size = 0,
 double *		sinCos=NULL;
 int				checkFFTerror = 0;
 double			maxFFTerror;
-static giant	u0=NULL, u1=NULL, v0=NULL, v1=NULL;
 static double	*z = NULL,
 				*z2 = NULL;
 
@@ -1623,7 +1622,7 @@ modg_via_recip(
 
 {
 	int		s = (bitlen(r)-1), sign = n->sign;
-	giant 	tmp, tmp2;
+	giant 	tmp;
 
 	if (isZero(d) || (d->sign < 0))
 	{
@@ -1631,7 +1630,7 @@ modg_via_recip(
 	}
 	
 	tmp = popg();
-	tmp2 = popg();
+	popg();
 	
 	n->sign = abs(n->sign);
 	while (1) 
@@ -2634,7 +2633,8 @@ grammarsquareg (
 {
 	unsigned int	cur_term;
 	unsigned int	prod, carry=0, temp;
-	int	asize = abs(a->sign), max = asize * 2 - 1;
+	unsigned int	asize = abs(a->sign);
+	unsigned int	max = asize * 2 - 1;
 	unsigned short	*ptr = a->n, *ptr1, *ptr2;
 	giant scratch;
 	
