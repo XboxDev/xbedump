@@ -436,6 +436,19 @@ if (option_flag & 0x00000002) {
        
          sechdr = (XBE_SECTION *)(((char *)xbe) + (int)header->Sections - (int)header->BaseAddress);
          for (i = 0; i < header->NumSections; i++, sechdr++) {
+ if (option_flag & 0x00000100) {
+    char *name = ((char  *)xbe)+(int)sechdr->SectionName-(int)header->BaseAddress;
+    if (!strcmp(name,".text")) {
+        printf("0x%08X ", sechdr->VirtualAddress);
+    }else if (!strcmp(name,".bss") || !strcmp(name,".data") || !strcmp(name,".rdata")) {
+        printf("-s %s 0x%08X ", name, sechdr->VirtualAddress);
+    }
+    if (i == header->NumSections-1) {
+        printf("\n");
+    }
+ }
+
+
  if (option_flag & 0x00000004) {
          printf("\nSection Header %i\n~~~~~~~~~~~~~~~~~\n", i);
  
